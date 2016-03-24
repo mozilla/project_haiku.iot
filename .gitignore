@@ -1,0 +1,10 @@
+.DS_Store
+*.rej
+*.log
+*.orig
+*.pyc
+*.swp
+*.swn
+*.swo
+.svn
+*~
