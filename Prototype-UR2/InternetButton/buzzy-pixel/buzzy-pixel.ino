@@ -41,20 +41,30 @@ void loop() {
 
 void handleEvent(const char *event, const char *data)
 {
-  if (VERBOSE_MODE) {
-    Serial.print(event);
-    Serial.print(", data: ");
-    Serial.print(data);
-  }
-
   // Compare the data returned with event and handle accordingly
   // This could be used to pass click, hold, or double click states
   if (strcmp(data,"click")==0) {
     //Turn on all LEDs with blue color
     b.allLedsOn(0,20,20);
-    delay(2000);
-    // Turn off all LEDs
-    b.allLedsOff();
-    delay(100);
+    delay(1000);
   }
+  // Confirm handshake by publishing successfuly received event
+  confirmHandShake(event, data);
+  // Turn off all LEDs
+  b.allLedsOff();
+  delay(100);
+}
+
+void confirmHandShake(const char *event, const char *data){
+  //Publish an event to confirm handshake for logs
+  char str[80];
+  strcpy (str, "Received ");
+  strcat (str, event);
+  strcat (str," data ");
+  strcat (str, data);
+  if (VERBOSE_MODE) {
+    Serial.print(str);
+  }
+  Particle.publish(PUBLISH_CONFIRM_EVENT, String(str), 60, PRIVATE);
+  delay(1000);
 }
