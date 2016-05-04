@@ -31,7 +31,7 @@ void loop() {
     // Publish the event PUBLISH_EVENT_NAME for paired device to use
     // with data stored in buffer array
     char buffer[60] = "click";
-    Particle.publish(PUBLISH_EVENT_NAME,String(buffer), 100, PRIVATE);
+    Particle.publish(PUBLISH_EVENT_NAME,String(buffer), 60, PRIVATE);
     delay(500);
   }
   else {
@@ -55,6 +55,6 @@ void handleEvent(const char *event, const char *data)
     delay(2000);
     // Turn off all LEDs
     b.allLedsOff();
-    delay(1000);
+    delay(100);
   }
 }
