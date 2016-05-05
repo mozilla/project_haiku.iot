@@ -1,5 +1,9 @@
+#pragma SPARK_NO_PREPROCESSOR
+
 #include "InternetButton.h"
 #include "ButtonConfig.h"
+#include "softap_http.h"
+#include "Page.h"
 // -----------------------------------------
 // Publish and Subscribe with Internet Button
 /* -----------------------------------------
@@ -12,32 +16,20 @@ Press of button on one device will turn on LEDs on the paired device
 
 InternetButton b = InternetButton();
 
-// We start with the setup function.
-void setup() {
-  Serial.begin(9600);
-  b.begin();
 
-  // Subscribe to paired device event event using Particle.subscribe
-  // Subscribe will listen for the event SUBSCRIBE_EVENT_NAME and
-  // when it finds it, will run the function handleEvent()
-  Particle.subscribe(SUBSCRIBE_EVENT_NAME, handleEvent, MY_DEVICES);
-}
-
-
-void loop() {
-  // Process individual buttons and LED response
-  if (b.buttonOn(1)) {
-    b.ledOn(12, 255, 0, 0); // Red
-    // Publish the event PUBLISH_EVENT_NAME for paired device to use
-    // with data stored in buffer array
-    char buffer[60] = "click";
-    Particle.publish(PUBLISH_EVENT_NAME,String(buffer), 60, PRIVATE);
-    delay(500);
+void confirmHandShake(const char *event, const char *data){
+  //Publish an event to confirm handshake for logs
+  char str[80];
+  strcpy (str, "Received ");
+  strcat (str, event);
+  strcat (str," data ");
+  strcat (str, data);
+  if (VERBOSE_MODE) {
+    Serial.print(str);
   }
-  else {
-    b.ledOn(12, 0, 0, 0);
-  }
-}
+  Particle.publish(PUBLISH_CONFIRM_EVENT, String(str), 60, PRIVATE);
+  delay(1000);
+};
 
 void handleEvent(const char *event, const char *data)
 {
@@ -53,18 +45,36 @@ void handleEvent(const char *event, const char *data)
   // Turn off all LEDs
   b.allLedsOff();
   delay(100);
-}
+};
 
-void confirmHandShake(const char *event, const char *data){
-  //Publish an event to confirm handshake for logs
-  char str[80];
-  strcpy (str, "Received ");
-  strcat (str, event);
-  strcat (str," data ");
-  strcat (str, data);
-  if (VERBOSE_MODE) {
-    Serial.print(str);
+
+// We start with the setup function.
+void setup() {
+  Serial.begin(9600);
+  b.begin();
+
+  // Subscribe to paired device event event using Particle.subscribe
+  // Subscribe will listen for the event SUBSCRIBE_EVENT_NAME and
+  // when it finds it, will run the function handleEvent()
+  Particle.subscribe(SUBSCRIBE_EVENT_NAME, handleEvent, MY_DEVICES);
+};
+
+
+void loop() {
+  // Process individual buttons and LED response
+  if (b.buttonOn(1)) {
+    b.ledOn(12, 255, 0, 0); // Red
+    // Publish the event PUBLISH_EVENT_NAME for paired device to use
+    // with data stored in buffer array
+    char buffer[60] = "click";
+    Particle.publish(PUBLISH_EVENT_NAME,String(buffer), 60, PRIVATE);
+    delay(500);
   }
-  Particle.publish(PUBLISH_CONFIRM_EVENT, String(str), 60, PRIVATE);
-  delay(1000);
-}
+  else {
+    b.ledOn(12, 0, 0, 0);
+  }
+};
+
+
+
+STARTUP(softap_set_application_page_handler(MyPage::display, nullptr));
