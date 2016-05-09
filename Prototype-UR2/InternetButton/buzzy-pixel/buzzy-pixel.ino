@@ -32,16 +32,16 @@ void handleEvent(const char *event, const char *data)
   // Compare the data returned with event and handle accordingly
   // This could be used to pass click, hold, or double click states
   if (strcmp(data,"click")==0) {
-    //Turn on all LEDs with blue color
-    b.allLedsOn(0,0,255);
+    //Turn on all LEDs with rainbow colors
+    b.rainbow(2);
     delay(1000);
   } else if (strcmp(data,"doubleclick")==0) {
-    //Turn on all LEDs with yellow color
-    b.allLedsOn(0,255,0);
+    //Turn on alternate LEDs with yellow and green color
+    b.dualColor(255, 255, 0, 0, 255, 0, 50);
     delay(1000);
   } else if (strcmp(data,"longpress")==0) {
-    //Turn on all LEDs with red color
-    b.allLedsOn(255,0,0);
+    //Turn on alternate LEDs with blue color
+    b.dualColor(0, 0, 255, 0, 0, 0, 50);
     delay(1000);
   }
   // Confirm handshake by publishing successfuly received event
@@ -55,7 +55,7 @@ void handleEvent(const char *event, const char *data)
 // This function will be called when the button1 was pressed 1 time
 void click() {
   Serial.println("Button click.");
-  b.ledOn(12, 0, 0, 255); // blue
+  b.ledOn(12, 230, 0, 255); // violet dominant rainbow color
   delay(500);
   b.ledOff(12);
   // Publish the event PUBLISH_EVENT_NAME for paired device to use
@@ -69,7 +69,7 @@ void click() {
 // This function will be called when the button was pressed 2 time
 void doubleClick() {
   Serial.println("Button double click.");
-  b.ledOn(12, 0, 255, 0); // green
+  b.ledOn(12, 255, 255, 0); // yellow
   delay(500);
   b.ledOff(12);
   // Publish the event PUBLISH_EVENT_NAME for paired device to use
@@ -84,7 +84,7 @@ void doubleClick() {
 // after beeing pressed for a long time.
 void longPress() {
   Serial.println("Button longPress");
-  b.ledOn(12, 255, 0, 0); // red
+  b.ledOn(12, 0, 0, 255); // blue
   delay(500);
   b.ledOff(12);
   // Publish the event PUBLISH_EVENT_NAME for paired device to use

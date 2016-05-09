@@ -123,8 +123,8 @@ void BlingButton::rainbow(uint8_t wait) {
   uint16_t i, j;
 
   for(j=0; j<256; j++) { // 1 cycle of all colors on wheel
-    for(i=0; i< 12; i++) {
-      uint8_t WheelPos = ((i * 256 / ring.numPixels()) + j) & 255;
+    for(i=0; i< PIXEL_COUNT; i++) {
+      uint8_t WheelPos = ((i * 256 / PIXEL_COUNT) + j) & 255;
       if(WheelPos < 85) {
          ring.setPixelColor(i,ring.Color(WheelPos * 3, 255 - WheelPos * 3, 0));
       } else if(WheelPos < 170) {
@@ -135,6 +135,19 @@ void BlingButton::rainbow(uint8_t wait) {
          ring.setPixelColor(i,ring.Color(0, WheelPos * 3, 255 - WheelPos * 3));
       }
     }
+    ring.show();
+    delay(wait);
+  }
+}
+
+// Fill the Neopixel one after the other with two colors
+void BlingButton::dualColor(uint8_t r1, uint8_t g1, uint8_t b1,
+  uint8_t r2, uint8_t g2, uint8_t b2, uint8_t wait) {
+  uint32_t c = ring.Color(r1, g1, b1);
+  uint32_t c1 = ring.Color(r2, g2, b2);
+  for(uint16_t i=0; i<PIXEL_COUNT;i=i+2) {
+    ring.setPixelColor(i, c);
+    ring.setPixelColor(i+1, c1);
     ring.show();
     delay(wait);
   }
