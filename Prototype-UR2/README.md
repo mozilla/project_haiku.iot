@@ -21,3 +21,20 @@ Vendor links are just a suggestion. You may want to adjust based on what you can
 * Hookup wire for all the connections. E.g. [Adafruit](https://www.adafruit.com/products/1311)
 
 
+### Connecting to WiFi
+
+* Make sure your WiFi is turned on. If phone: Tap Home > Settings > WiFi on your phone. If computer: do tap WiFi icon on your computer to choose a WiFi network.
+
+* Press SETUP button on your device for 3 seconds. This will put your device in Listening Mode and your device should begin blinking dark blue. When your device is in Listening Mode, it is waiting for you to connect it to WiFi.
+
+* Go to Home > Settings > Wifi and change to the Photon-XXXX network.
+
+* After connected to Photon-XXXX network, open browser and enter this URL http://192.168.0.1/index.html in a browser window.
+
+* Click the Scan button. A list of WiFi networks will show.
+
+* Press the option button for your home WiFi network.
+
+* Enter your home WiFi password in the Password field. Then click Connect button. Your device should blink green to let you know it’s trying to connect to the internet. An alert will show with help instruction in case you entered wrong password. Press OK.
+
+* Give your device a few seconds to connect and start blinking light blue. When it is blinking light blue, your device is happily connected to the Internet!
