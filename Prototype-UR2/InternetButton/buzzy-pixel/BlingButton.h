@@ -1,24 +1,3 @@
-/*
- Arduino Library for Analog Devices ADXL362 - Micropower 3-axis accelerometer
- go to http://www.analog.com/ADXL362 for datasheet
-
-
- License: CC BY-SA 3.0: Creative Commons Share-alike 3.0. Feel free
- to use and abuse this code however you'd like. If you find it useful
- please attribute, and SHARE-ALIKE!
-
- Created June 2012
- by Anne Mahaffey - hosted on http://annem.github.com/ADXL362
-
- Modified Mars 2014
- by pixelk
-
- Modified for Spark Core/Button October 2014
- Updated for Particle Photon July 2015
- by jenesaisdiq
-
- */
-
 #include "application.h"
 
 #ifndef BlingButton_h
@@ -68,6 +47,8 @@ class BlingButton {
 // Copyright (c) by Matthias Hertel, http://www.mathertel.de
 // This work is licensed under a BSD style license. See http://www.mathertel.de/License.aspx
 // More information on: http://www.mathertel.de/Arduino
+// An Arduino library for using a single button for multiple purpose input.
+// https://github.com/mathertel/OneButton
 // -----
 
 #ifndef OneButton_h
@@ -131,7 +112,6 @@ private:
 
 //----------------- LED Handling ------------------------
 #define PIXEL_COUNT 5
-//#define PIXEL_PIN D3
 #define PIXEL_TYPE WS2812B
 
 /*-------------------------------------------------------------------------
@@ -156,6 +136,7 @@ private:
 /* ======================= Adafruit_NeoPixel.h ======================= */
 /*--------------------------------------------------------------------
   This file is part of the Adafruit NeoPixel library.
+  https://github.com/adafruit/Adafruit_NeoPixel
 
   NeoPixel is free software: you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as

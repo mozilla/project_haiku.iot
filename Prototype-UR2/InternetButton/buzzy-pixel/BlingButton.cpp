@@ -7,11 +7,6 @@ uint8_t pixel_pin = 3;
 uint8_t b1 = 4;
 uint8_t vibe_pin = D5;
 
-// uint8_t b2 = 5;
-// uint8_t b3 = 6;
-// uint8_t b4 = 7;
-
-
 Adafruit_NeoPixel ring = Adafruit_NeoPixel(PIXEL_COUNT, pixel_pin, PIXEL_TYPE);
 OneButton button = OneButton(b1, true);
 
@@ -25,23 +20,13 @@ void BlingButton::begin(){
 
     pinMode(vibe_pin, OUTPUT);
     pinMode(b1, INPUT_PULLUP);
-    // pinMode(b2, INPUT_PULLUP);
-    // pinMode(b3, INPUT_PULLUP);
-    // pinMode(b4, INPUT_PULLUP);
     String msg = "BlingButton begin";
     log(msg);
 
 }
 
 void BlingButton::log(String str){
-  // //Publish an event to confirm handshake for logs
-  // char str[80];
-  // strcpy (str, "Received ");
-  // strcat (str, event);
-  // strcat (str," data ");
-  // strcat (str, data);
   Particle.publish(BLINGBTN_LOGGING_TOPIC, str, 60, PRIVATE);
-  // delay(200);
 }
 
 void BlingButton::ledOn(uint8_t i, uint8_t r, uint8_t g, uint8_t b){
@@ -154,7 +139,6 @@ void BlingButton::dualColor(uint8_t r1, uint8_t g1, uint8_t b1,
 }
 
 void BlingButton::vibrate(int duration){
-  // TODO: get a pin for the vibration motor and turn it on for duration ms
     log("vibrate");
     digitalWrite(vibe_pin, HIGH);
     delay(duration);
@@ -185,6 +169,8 @@ void BlingButton::listen(void){
 // This work is licensed under a BSD style license. See http://www.mathertel.de/License.aspx
 // More information on: http://www.mathertel.de/Arduino
 // -----
+// An Arduino library for using a single button for multiple purpose input.
+// https://github.com/mathertel/OneButton
 
 // ----- Initialization and Default Values -----
 
@@ -366,6 +352,7 @@ void OneButton::tick(void)
 /* ======================= Adafruit_NeoPixel.cpp ======================= */
 /*-------------------------------------------------------------------------
   This file is part of the Adafruit NeoPixel library.
+  https://github.com/adafruit/Adafruit_NeoPixel
 
   NeoPixel is free software: you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as

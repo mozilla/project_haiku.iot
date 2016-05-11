@@ -34,19 +34,19 @@ void handleEvent(const char *event, const char *data)
   if (strcmp(data,"click")==0) {
     //Turn on all LEDs with rainbow colors
     b.rainbow(2);
-    delay(1000);
   } else if (strcmp(data,"doubleclick")==0) {
     //Turn on alternate LEDs with yellow and green color
     b.dualColor(255, 255, 0, 0, 255, 0, 50);
-    delay(1000);
   } else if (strcmp(data,"longpress")==0) {
     //Turn on alternate LEDs with blue color
     b.dualColor(0, 0, 255, 0, 0, 0, 50);
-    delay(1000);
   }
+  delay(500);
   // Confirm handshake by publishing successfuly received event
   confirmHandShake(event, data);
-  // Turn off all LEDs
+  // Vibrate and turn off all LEDs
+  b.vibrate(200);
+  delay(1000);
   b.allLedsOff();
   delay(100);
 };
