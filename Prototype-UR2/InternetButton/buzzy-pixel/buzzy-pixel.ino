@@ -12,6 +12,7 @@ with respective config settings
 Press of button on one device will turn on LEDs on the paired device
 ------------------------------------------*/
 BlingButton b = BlingButton();
+unsigned long prev_time = millis();
 
 void confirmHandShake(const char *event, const char *data){
   //Publish an event to confirm handshake for logs
@@ -45,8 +46,8 @@ void handleEvent(const char *event, const char *data)
   // Confirm handshake by publishing successfuly received event
   confirmHandShake(event, data);
   // Vibrate and turn off all LEDs
-  b.vibrate(200);
-  delay(1000);
+  b.vibrate(600);
+  delay(1500);
   b.allLedsOff();
   delay(100);
 };
@@ -111,6 +112,12 @@ void setup() {
 
 void loop() {
   b.listen();
+  if(millis() - prev_time >= BATTERY_CHECK_TIME) {
+    if (b.batteryLevel() < BATTERY_THRESHOLD) {
+        System.sleep(SLEEP_MODE_DEEP);
+    }
+    prev_time = millis();
+  }
 };
 
 STARTUP(softap_set_application_page_handler(MyPage::display, nullptr));

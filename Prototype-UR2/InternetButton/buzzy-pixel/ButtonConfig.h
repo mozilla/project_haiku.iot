@@ -18,3 +18,5 @@
 #define PUBLISH_CONFIRM_EVENT "RECEIVED_CONFIRMATION"
 
 #define VERBOSE_MODE  true  // If set to 'true' enables debug output
+#define BATTERY_CHECK_TIME 60000 // Check after every 60 seconds
+#define BATTERY_THRESHOLD 5 // Battery threshold below which device should sleep
