@@ -1,3 +1,5 @@
+pin_hinge_gap=0.5;
+
 module example_hinge() {
     translate([0,0,6]) {
         horizontal_pin_with_5_fingers(25, 3);
@@ -28,7 +30,7 @@ module countersink_ends(h, radius, pin_radius) {
 
 module pin_hinge_unit(h, radius, pin_radius=1.5, index=0) {
     $fn=30;
-    gap=0.75;
+    gap=pin_hinge_gap;
     translate([0,radius-gap,0]) difference() {
         // the barrel+lug
         hull() {

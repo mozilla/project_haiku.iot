@@ -5,38 +5,98 @@ height=17.5;
 lid_height=5;
 wall=1.5;
 r=wall*2;
+inset=0.75;
 
-translate([-1.2*width/2,0,0]) {
-    difference() {
-        hinged_box(width, length, 10, 1);
-        translate([0, -length/2, -2]) {
-            charge_port(10, 5, wall);
-        }
-    }
-}
-translate([1.2*width/2,0,0]) rotate([0,180,0]) {
+// the base
+translate([-1.2*width/2,0,height/2+wall]) {
     difference() {
         union() {
-            hinged_box(width, length, 10, -1);
+            hinged_box(width, length, height, 1);
         }
-        translate([0,12,5+wall]) rotate(180) button(10,36,wall*2);
+        union() {
+            // aperture for the usb port
+            *translate([0, -length/2, -2]) {
+                charge_port(10, 5, wall);
+            }
+            // top strap receiver
+            #top_strap(width/3);
+        }
+    }
+}
+
+// the lid
+translate([1.2*width/2,0,lid_height/2+wall]) rotate([0,180,0]) {
+    difference() {
+        union() {
+            hinged_box(width, length, lid_height, -1);
+        }
+        translate([0,12,lid_height/2+wall]) rotate(180) button(10,36,wall*2);
     }
 
 }
 
+// the strap
+translate([1.2*width+1.2*width/2,0,width/3/2]) {
+    rotate([0,90,0]) {
+        top_strap(width/3);
+    }
+}
+
+module top_strap(strap_w) {
+    strap_len=length+inset;
+    wall=1;
+    translate([0,0,inset*2]) union() {
+        union() {
+            cube([strap_w, strap_len, height-wall], center=true);
+            translate([0,0,-height/2+inset*2]) {
+                rotate([0,0,90]) outer_ridges(inset, strap_w, [strap_len, strap_w, height]);
+            }
+        }
+        translate([0,0,-wall/2]) #cube([strap_w, strap_len-2*wall, height-wall*2], center=true);
+    }
+}
+module outer_ridges(radius, length, bounds) {
+    translate([-1*(bounds[0]/2+radius/2), 0]) {
+        rotate([180,0,0]) ridge(radius, length, 1);
+    }
+    translate([bounds[0]/2+radius/2, 0]) {
+        rotate([180,0,0]) ridge(radius, length, -1);
+    }
+}
+module ridge(radius, length, orient=1) {
+    rotate([0,0,orient<0?0:180]) 
+    translate([-radius/2, 0, radius/2]) difference() {
+        rotate([90,0,0]) cylinder(r=radius, h=length, center=true, $fn=12);
+        union() {
+            translate([0,0,radius/2]) cube([radius*2, length, radius], center=true);
+            translate([-radius/2,0,0]) #cube([radius, length, radius*2], center=true);
+        }
+    }
+}
+
+module hinged_oval_box(width, length, height, orient) {
+    hull() {
+        translate([0, -length/2+5, 2]) {
+            resize(newsize=[width, width/2, height]) sphere(d=width, center=true);
+        }
+        translate([0, +length/2-5, 2]) {
+            resize(newsize=[width*1.25, width/2, height]) sphere(d=width, center=true);
+        }
+    }
+}
 module hinged_box(width, length, height, orient) {
     difference() {
         union() {
             shell(width, length, height, r, orient);
-            clearance=wall+1;
-            translate([0,-1*(length/2+r),orient*(height-3.25)]) {
+            clearance=wall;
+            translate([0,-1*(length/2+r+clearance),orient*(height/2+r/2)]) {
               rotate(a=[90,180,0]) translate([0,0,0.25]) {
                   _pin_hinge(width*.66, 4, orient>0?0:1);
               }
             }
         }
         union() {
-            #translate([0,0,orient*wall]) outer_box(width, length, height+r*2, r/2);
+            translate([0,0,orient*wall]) radiused_cube([width, length, height+r*2], r/2);
         }
     }
 }
@@ -59,14 +119,15 @@ module _pin_hinge(h, radius, is_top=0) {
 
 module shell(width, length, height, r, orient=1) {
     // hollow box sized to interior dimension
+    // w. thicker end walls
     difference() {
-        radiused_cube([width+wall*2, length+wall*2, height+wall*2], r);
-        translate([0,0,orient*r/2])#radiused_cube([width, length, height+r], r);
+        radiused_cube([width+wall*2, length+wall*4, height+wall*2], r);
+        translate([0,0,orient*r/2]) radiused_cube([width, length, height+r], r);
     }
 }
 
 module radiused_cube(dims, radius, center=true) {
-    // radiused box sized to *outer* dimensions 
+    // radiused box sized to *outer* dimensions
     w=dims[0]; l=dims[1]; h=dims[2];
     offset=radius;
     translate([-w/2,-l/2,-h/2]) hull() {
