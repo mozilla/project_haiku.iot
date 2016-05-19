@@ -1,6 +1,9 @@
 use <pin-hinge.scad>;
+model_version="UR2 v1.0";
 width=40;
+half_w=width/2;
 length=66;
+half_l=length/2;
 height=17.5;
 lid_height=8;
 wall=1;
@@ -16,7 +19,7 @@ union() {
     offset_x=5;
     enclosure_base([-1*(width/2+offset_x),0,height/2+wall/2]);
     enclosure_lid([width/2+offset_x,0,lid_height/2+wall/2]);
-    enclosure_straps([width+offset_x*2+20,0,0]);
+    enclosure_straps([width+offset_x*2+20,0,0.75]);
 }
 //}
 
@@ -26,7 +29,6 @@ module enclosure_base(offsets) {
         difference() {
             union() {
                 hinged_box(width, length, height, 1);
-
                 // lanyard attach point
                 translate([0,-0.5*length-6, -0.5*(height+wall)+2.5]) {
                     difference() {
@@ -39,22 +41,31 @@ module enclosure_base(offsets) {
                 }
                 // lip
                 union() {
-                    translate([width/2-wall+0.25,-length/2+12,wall+height/2]) cube([wall, 16, 8], center=true);
-                    #translate([-width/2+0.25,-length/2+18,wall+height/2]) cube([wall, 16, 8], [0,2,0], center=true);
-                    translate([width/2-wall+0.25,-length/2+52,wall+height/2]) cube([wall, 10, 8], center=true);
-                    translate([-width/2+0.25,-length/2+50,wall+height/2]) #cube([wall, 10, 8], center=true);
+                    lip_w=wall*1.5;
+                    lip_h=6;
+                    translate([half_w-lip_w/2,-half_l+20,wall+height/2-1]) cube([lip_w, 10, lip_h], center=true);
+                    translate([-half_w+lip_w/2,-half_l+20,wall+height/2-1]) cube([lip_w, 10, lip_h], [0,2,0], center=true);
+                    translate([half_w-lip_w/2,-half_l+56,wall+height/2-1]) cube([lip_w, 10, lip_h], center=true);
+                    translate([-half_w+lip_w/2,-half_l+56,wall+height/2-1]) cube([lip_w, 10, lip_h], center=true);
                 }
             }
             union() {
+                // version stamp
+                translate([0,0,-height/2+wall-0/0.25]) {
+                    #linear_extrude(height=1, center=true)
+                        text(model_version, size=4, valign="center", halign="center");
+                }
+                
                 // aperture for the usb port
-                translate([-width/2-wall, -length/2+37, height/2-1]) {
-                   rotate(90) charge_port(10, 5, wall*2);
+                translate([-width/2-wall, -length/2+39.5, height/2-1]) {
+                   rotate(90) charge_port(10, 7, wall*2);
                 }
                 *translate([width/2+wall-1, -length/2+32, height/2-5]) {
                    #cube(5);
                 }
+                // aperture for the battery port
                 translate([width/2+wall-1, -length/2+32, height/2-1]) {
-                   rotate(90) #charge_port(10, 5, wall*2);
+                   rotate(90) #charge_port(10, 7, wall*2);
                 }
                 // latch push
                 translate([0, length/2+width/4-1.25, width/4-2]) rotate([90,0,0]) #cylinder(r=7, h=inset*2, center=true);
