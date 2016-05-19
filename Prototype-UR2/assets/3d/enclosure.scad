@@ -2,7 +2,7 @@ use <pin-hinge.scad>;
 width=40;
 length=66;
 height=17.5;
-lid_height=9;
+lid_height=8;
 wall=1;
 radius_xy=wall*4;
 radius_z=wall*2;
@@ -11,12 +11,12 @@ strap_height=13;
 
 // debug: check all objects sit on the bed platform
 //projection(cut=true) {
-*translate([width/3,0,-1]) cube([width*4, length+20, 2], center=true);
+translate([width/3,0,-1]) %cube([width*4, length+20, 2], center=true);
 union() {
     offset_x=5;
     enclosure_base([-1*(width/2+offset_x),0,height/2+wall/2]);
     enclosure_lid([width/2+offset_x,0,lid_height/2+wall/2]);
-    enclosure_strap([width+offset_x*2+height/2,0,width/6]);
+    enclosure_straps([width+offset_x*2+20,0,0]);
 }
 //}
 
@@ -26,25 +26,38 @@ module enclosure_base(offsets) {
         difference() {
             union() {
                 hinged_box(width, length, height, 1);
-                translate([-width/2+wall/2,-2,height/2-6]) #cube([1.5, 20, 1.5], center=true);
+
                 // lanyard attach point
                 translate([0,-0.5*length-6, -0.5*(height+wall)+2.5]) {
                     difference() {
                         cylinder(r=9, h=5, center=true);
                         union() {
                             cylinder(r=5, h=5, center=true);
-                            translate([0, 8.5, 0])#cube([18, 5, 5], center=true);
+                            translate([0, 8.5, 0]) cube([18, 5, 5], center=true);
                         }
                     }
+                }
+                // lip
+                union() {
+                    translate([width/2-wall+0.25,-length/2+12,wall+height/2]) cube([wall, 16, 8], center=true);
+                    #translate([-width/2+0.25,-length/2+18,wall+height/2]) cube([wall, 16, 8], [0,2,0], center=true);
+                    translate([width/2-wall+0.25,-length/2+52,wall+height/2]) cube([wall, 10, 8], center=true);
+                    translate([-width/2+0.25,-length/2+50,wall+height/2]) #cube([wall, 10, 8], center=true);
                 }
             }
             union() {
                 // aperture for the usb port
-                translate([-width/2-wall, -length/2+47.5, height/2-3]) {
-                   #rotate(90) charge_port(12, 7, wall);
+                translate([-width/2-wall, -length/2+37, height/2-1]) {
+                   rotate(90) charge_port(10, 5, wall*2);
                 }
-                // top strap receiver+lateral wiggle room
-                translate([0,0,-0.5*(height-strap_height)+wall]) top_strap(width/3+4, strap_height);
+                *translate([width/2+wall-1, -length/2+32, height/2-5]) {
+                   #cube(5);
+                }
+                translate([width/2+wall-1, -length/2+32, height/2-1]) {
+                   rotate(90) #charge_port(10, 5, wall*2);
+                }
+                // latch push
+                translate([0, length/2+width/4-1.25, width/4-2]) rotate([90,0,0]) #cylinder(r=7, h=inset*2, center=true);
             }
         }
     }
@@ -63,31 +76,39 @@ module enclosure_lid(offsets) {
     }
 }
 
-module enclosure_strap(offsets) {
+module enclosure_straps(offsets) {
     // the strap
+    length=60;
     translate(offsets) {
-        rotate([0,90,0]) {
-            fudge=0;
-            translate([13/2-wall/2+fudge,0,-13/2]) #cube([wall, length-4, 5], center=true);
-            top_strap(width/3, 13);
+        union() {
+            translate([0,0,0]) cube([8, length, 1.5], center=true);
+            #translate([0,-length/2+20,0.75]) cube([width-3, 1.5, 1.5], center=true);
+            translate([0,-length/2+22,0]) cube([width, 8, 1.5], center=true);
+            translate([0,length/2-4,0]) cube([width, 8, 1.5], center=true);
+            translate([0,length/2-0.75,1]) cube([width, 1.5, 3], center=true);
         }
     }
 }
 
-module top_strap(strap_w, h) {
-    strap_len=length+inset;
-    wall=1;
-    thickness=1;
-    translate([0,0,inset*2]) difference() {
-        union() {
-            cube([strap_w, strap_len, h], center=true);
-            translate([0,0,+h/2-thickness/2]) {
-                rotate([0,0,90]) outer_ridges(thickness, strap_w, [strap_len, strap_w, h]);
+module retainer(dims, center=false) {
+    xdim=dims[0];
+    ydim=dims[1];
+    zdim=dims[2];
+    half_z=zdim/2;
+    translate([0, 0, center? half_z/2 : 0]) {
+        cube([xdim, ydim, half_z], center=center);
+        translate([0,0,half_z]) {
+            if (center) {
+                cube([xdim-zdim*2, ydim, half_z], center=center);
+            }
+            else {
+                translate([zdim, 0, half_z]) cube([xdim-zdim*2, ydim, half_z], center=center);
             }
         }
-        translate([0,0,+wall/2]) cube([strap_w, strap_len-2*wall, h-wall], center=true);
     }
+
 }
+
 module outer_ridges(radius, length, bounds) {
     translate([-1*(bounds[0]/2+radius/2), 0]) {
         rotate([180,0,0]) ridge(radius, length, 1);
@@ -142,11 +163,11 @@ module hinged_box(width, length, height, orient) {
             }
             // the latch
             translate([0,length/2+8.5,orient*(height/2-3)]) {
-                translate([0,-1.5,0]) #cube([20, wall, 6], center=true);
+                translate([0,-1.5,0]) cube([20, wall, 6], center=true);
             }
             if (orient > 0) {
                 translate([0,length/2+7.25,height/2+4.5]) {
-                    translate([0,-1.5,-4.5]) cube([10, wall*2, 10], center=true);
+                    translate([0,-1,-4.5]) cube([10, wall*1.5, 10], center=true);
                     rotate([90, 90, 0]) ridge(1, 10, 1);
                 }
             }
@@ -155,8 +176,10 @@ module hinged_box(width, length, height, orient) {
             if (orient < 0) {
                 // lid latch receiver
                 translate([0,length/2+7.25,height/2-3]) {
-                    translate([0,-1.5,-4.5]) cube([10, wall*2, 10], center=true);
-                    rotate([90, 90, 0]) ridge(1, 10, 1);
+                    difference() {
+                        translate([0,0,-1.5]) #cube([10, wall*1.5, 2], center=true);
+                        *translate([0,-1,-4.5]) cube([10, wall*1.5, 10], center=true);
+                    }
                 }
             }
         }
@@ -172,15 +195,15 @@ module _pin_hinge(h, radius, is_top=0, clearance=0) {
     rotate([-90,0,0]) rotate([0,90,0]) translate([0,-radius,-1*(h/2)+unit_h/2]) {
         for(i=[0:fingers-1]) {
             if (i%2>0 && is_top) {
-                translate([0,0, gap*i+i*unit_h]) {
+                translate([-0.5,0, gap*i+i*unit_h]) {
                     pin_hinge_unit(unit_h, radius, pin_radius, i, gap);
-                    translate([radius-1,radius*2,0]) cube([radius*1.5, radius, unit_h], center=true);
+                    translate([radius,radius*2,0]) cube([radius*1.5, radius, unit_h], center=true);
                 }
             }
             if (i%2==0 && !is_top) {
-                translate([0,0, gap*i+i*unit_h]) {
+                translate([0.5,0, gap*i+i*unit_h]) {
                     pin_hinge_unit(unit_h, radius, pin_radius, i);
-                    translate([-1*(radius-1),radius*2,0]) cube([radius*1.5, radius, unit_h], center=true);
+                    translate([-1*(radius),radius*2,0]) cube([radius*1.5, radius, unit_h], center=true);
                 }
             }
         }
@@ -214,7 +237,7 @@ module shell(width, length, height, orient=1) {
         }
     }
     translate([0,length/2+wall,0]) {
-        cube([width*0.75, wall*2, height], center=true);
+        #cube([width*0.66, wall*2, height], center=true);
     }
 }
 
