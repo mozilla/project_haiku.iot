@@ -6,6 +6,7 @@
 uint8_t pixel_pin = D3;
 uint8_t b1 = D4;
 uint8_t vibe_pin = D5;
+uint8_t battery_sense_pin = A5;
 
 // uint8_t b2 = 5;
 // uint8_t b3 = 6;
@@ -42,6 +43,25 @@ void BlingButton::log(String str){
   Particle.publish(BLINGBTN_LOGGING_TOPIC, str, 60, PRIVATE);
   // delay(200);
 }
+
+float BlingButton::batteryLevel() {
+  float batteryVolts;
+#if defined(BATTERY_CHECK)
+  const float voltsPerBit = 3.3 / 4095; // Calculate volts per bit of ADC reading
+  const float ratioV = (120000 + 33000) / 33000; //Calculates to 4.636363
+  int Vin = analogRead(battery_sense_pin);
+  float rawVolts = Vin * voltsPerBit;  //Calculate voltage at A0 input
+  batteryVolts = rawVolts * ratioV;
+  Serial.print("Voltage ");
+  Serial.print(batteryVolts);
+  Serial.print("  Raw ");
+  Serial.print (Vin);
+#else
+  Serial.print("batteryLevel: using fake value");
+  batteryVolts = 8.3; // fake this value till the A5 return reading
+#endif
+  return batteryVolts;
+};
 
 void BlingButton::ledOn(uint8_t i, uint8_t r, uint8_t g, uint8_t b){
     //i-1 shifts the location from human readable to the right index for the LEDs

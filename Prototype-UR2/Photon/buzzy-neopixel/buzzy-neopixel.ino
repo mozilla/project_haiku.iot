@@ -37,6 +37,12 @@ void loop() {
       b.vibrate(100);
       do_signal1();
       b.log("signalled");
+      #if defined(BATTERY_CHECK)
+      float batt_level = b.batteryLevel();
+      char batt_buffer[40];
+      sprintf(batt_buffer, "%5.2f", batt_level);
+      Particle.publish("BATTERY_SENSOR", batt_buffer, 40, PRIVATE);
+      #endif
     } else {
       msg = "button not pressed";
     }

@@ -43,6 +43,8 @@ class BlingButton {
     smoothLedOn(float i, uint8_t r, uint8_t g, uint8_t b);
   uint8_t
     buttonOn(void);
+  float
+    batteryLevel(void);
 
  private:
 
@@ -97,6 +99,8 @@ class BlingButton {
 #define SPARK_NEOPIXEL_H
 
 #include "application.h"
+
+#define BATTERY_CHECK 1
 
 // 'type' flags for LED pixels (third parameter to constructor):
 #define WS2812   0x02 // 800 KHz datastream (NeoPixel)
