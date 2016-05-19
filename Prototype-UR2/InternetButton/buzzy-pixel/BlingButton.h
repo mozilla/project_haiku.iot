@@ -25,10 +25,11 @@ class BlingButton {
     rainbow(uint8_t wait),
     dualColor(uint8_t r1, uint8_t g1, uint8_t b1,
       uint8_t r2, uint8_t g2, uint8_t b2, uint8_t wait),
-    vibrate(int duration),
-    smoothLedOn(float i, uint8_t r, uint8_t g, uint8_t b);
+    vibrate(int duration);
   uint8_t
     buttonOn(void);
+  float
+    batteryLevel(void);
 
   void attachClick(callbackFunction newFunction);
   void attachDoubleClick(callbackFunction newFunction);

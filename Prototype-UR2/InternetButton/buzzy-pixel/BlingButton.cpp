@@ -29,6 +29,21 @@ void BlingButton::log(String str){
   Particle.publish(BLINGBTN_LOGGING_TOPIC, str, 60, PRIVATE);
 }
 
+float BlingButton::batteryLevel() {
+
+  const float voltsPerBit = 3.3 / 4095; // Calculate volts per bit of ADC reading
+  const float ratioV = (120000 + 33000) / 33000; //Calculates to 4.636363
+  int Vin = analogRead(A0);
+  float rawVolts = Vin * voltsPerBit;  //Calculate voltage at A0 input
+  float batteryVolts = rawVolts * ratioV;
+  Serial.print("Voltage ");
+  Serial.print(batteryVolts);
+  Serial.print("  Raw ");
+  Serial.print (Vin);
+  batteryVolts = 8; // fake this value till the A0 return reading
+  return batteryVolts;
+};
+
 void BlingButton::ledOn(uint8_t i, uint8_t r, uint8_t g, uint8_t b){
     //i-1 shifts the location from human readable to the right index for the LEDs
     if(i == 12){
@@ -38,47 +53,6 @@ void BlingButton::ledOn(uint8_t i, uint8_t r, uint8_t g, uint8_t b){
     else{
         ring.setPixelColor(i-1, ring.Color(r,g,b));
     }
-    ring.show();
-}
-
-void BlingButton::smoothLedOn(float i, uint8_t r, uint8_t g, uint8_t b){
-    //uint8_t intI = lrintf(i);
-    //Serial.print("intI: ");
-    //Serial.println(intI);
-
-    //float differ = i-(float)intI + 0.5;
-    //Serial.print("differ: ");
-    //Serial.println(differ);
-
-    float tempI;
-    float differ = modff(i, &tempI);
-    uint8_t intI = (uint8_t)tempI;
-
-
-    // checks to see if it's reeeeally close to being an integer
-    //if(abs(differ) < 0.01){
-      // intI-1 shifts the location from human readable to the right index for the LEDs
-    //  ring.setPixelColor(intI-1, ring.Color(r,g,b));
-    //  Serial.println("tripped int check");
-    //}
-    //else {
-      // diff > 0 means that it's closer to the lower one
-      float differ1 = 1.0-differ;
-      //differ1 = logf(differ1);
-      //differ = logf(differ);
-      if(differ > 0.5){
-        differ1 /= 2;
-        //ring.setPixelColor(intI-2, ring.Color((int)(differ1*r),(int)(differ1*g),(int)(differ1*b)));
-        ring.setPixelColor(intI-1, ring.Color((int)(differ1*r),(int)(differ1*g),(int)(differ1*b)));
-        ring.setPixelColor(intI, ring.Color((int)(differ*r),(int)(differ*g),(int)(differ*b)));
-      }
-      else {
-        differ /= 2;
-        //ring.setPixelColor(intI-2, ring.Color((int)(differ*r),(int)(differ*g),(int)(differ*b)));
-        ring.setPixelColor(intI-1, ring.Color((int)(differ1*r),(int)(differ1*g),(int)(differ1*b)));
-        ring.setPixelColor(intI, ring.Color((int)(differ*r),(int)(differ*g),(int)(differ*b)));
-      }
-    //}
     ring.show();
 }
 
