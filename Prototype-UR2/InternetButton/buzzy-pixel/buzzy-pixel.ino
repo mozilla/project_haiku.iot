@@ -30,6 +30,8 @@ void confirmHandShake(const char *event, const char *data){
 
 void handleEvent(const char *event, const char *data)
 {
+   // Vibrate
+   b.vibrate(400);
   // Compare the data returned with event and handle accordingly
   // This could be used to pass click, hold, or double click states
   if (strcmp(data,"click")==0) {
@@ -45,9 +47,8 @@ void handleEvent(const char *event, const char *data)
   delay(500);
   // Confirm handshake by publishing successfuly received event
   confirmHandShake(event, data);
-  // Vibrate and turn off all LEDs
-  b.vibrate(600);
-  delay(1500);
+  delay(500);
+  // Turn off all LEDs
   b.allLedsOff();
   delay(100);
 };

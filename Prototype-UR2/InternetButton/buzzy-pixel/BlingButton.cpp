@@ -32,14 +32,17 @@ void BlingButton::log(String str){
 
 float BlingButton::batteryLevel() {
   const float voltsPerBit = 3.3 / 4095; // Calculate volts per bit of ADC reading
-  const float ratioV = (120000 + 33000) / 33000; //Calculates to 4.636363
+  const float ratioV = (47000 + 33000) / 33000; //Calculates to 4.636363
   int Vin = analogRead(battery_sense_pin);
   float rawVolts = Vin * voltsPerBit;  //Calculate voltage at A5 input
   float batteryVolts = rawVolts * ratioV;
   Serial.print("Voltage ");
   Serial.print(batteryVolts);
-  Serial.print("  Raw ");
+  Serial.print("Raw ");
   Serial.print (Vin);
+  char batteryRaw[60];
+  sprintf(batteryRaw, "%5.2f", rawVolts);
+  log(batteryRaw);
   return batteryVolts;
 };
 
