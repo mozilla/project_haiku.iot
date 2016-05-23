@@ -112,7 +112,7 @@ void setup() {
 
 void loop() {
   b.listen();
-  if (BATTERY_CHECK) {
+  #if defined(BATTERY_CHECK)
     if(millis() - prev_time >= BATTERY_CHECK_TIME) {
       Serial.println("Battery Check Triggered");
       if (b.batteryLevel() < BATTERY_THRESHOLD) {
@@ -120,7 +120,7 @@ void loop() {
       }
       prev_time = millis();
     }
-  }
+  #endif
 };
 
 STARTUP(softap_set_application_page_handler(MyPage::display, nullptr));
