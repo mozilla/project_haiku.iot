@@ -112,7 +112,6 @@ void BlingButton::dualColor(uint8_t r1, uint8_t g1, uint8_t b1,
 }
 
 void BlingButton::vibrate(int duration){
-    log("vibrate");
     digitalWrite(vibe_pin, HIGH);
     delay(duration);
     digitalWrite(vibe_pin, LOW);

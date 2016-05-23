@@ -115,9 +115,16 @@ void loop() {
   #if defined(BATTERY_CHECK)
     if(millis() - prev_time >= BATTERY_CHECK_TIME) {
       Serial.println("Battery Check Triggered");
-      if (b.batteryLevel() < BATTERY_THRESHOLD) {
-          System.sleep(SLEEP_MODE_DEEP);
-      }
+      // Log the Battery level
+      float batteryLevel = b.batteryLevel();
+      char batteryBuffer[60];
+      sprintf(batteryBuffer, "%5.2f", batteryLevel);
+      Particle.publish(BATTERY_LEVEL_EVENT,String(batteryBuffer), 60, PRIVATE);
+      // Uncomment code below to put device in sleep mode
+      // when battery level is below  BATTERY_THRESHOLD
+      //if (batteryLevel < BATTERY_THRESHOLD) {
+      //    System.sleep(SLEEP_MODE_DEEP);
+      //}
       prev_time = millis();
     }
   #endif
