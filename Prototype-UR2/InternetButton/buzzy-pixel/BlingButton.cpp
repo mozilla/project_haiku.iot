@@ -6,6 +6,7 @@
 uint8_t pixel_pin = 3;
 uint8_t b1 = 4;
 uint8_t vibe_pin = D5;
+uint8_t battery_sense_pin = A5;
 
 Adafruit_NeoPixel ring = Adafruit_NeoPixel(PIXEL_COUNT, pixel_pin, PIXEL_TYPE);
 OneButton button = OneButton(b1, true);
@@ -30,17 +31,15 @@ void BlingButton::log(String str){
 }
 
 float BlingButton::batteryLevel() {
-
   const float voltsPerBit = 3.3 / 4095; // Calculate volts per bit of ADC reading
   const float ratioV = (120000 + 33000) / 33000; //Calculates to 4.636363
-  int Vin = analogRead(A0);
-  float rawVolts = Vin * voltsPerBit;  //Calculate voltage at A0 input
+  int Vin = analogRead(battery_sense_pin);
+  float rawVolts = Vin * voltsPerBit;  //Calculate voltage at A5 input
   float batteryVolts = rawVolts * ratioV;
   Serial.print("Voltage ");
   Serial.print(batteryVolts);
   Serial.print("  Raw ");
   Serial.print (Vin);
-  batteryVolts = 8; // fake this value till the A0 return reading
   return batteryVolts;
 };
 

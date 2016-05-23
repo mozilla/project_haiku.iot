@@ -112,11 +112,14 @@ void setup() {
 
 void loop() {
   b.listen();
-  if(millis() - prev_time >= BATTERY_CHECK_TIME) {
-    if (b.batteryLevel() < BATTERY_THRESHOLD) {
-        System.sleep(SLEEP_MODE_DEEP);
+  if (BATTERY_CHECK) {
+    if(millis() - prev_time >= BATTERY_CHECK_TIME) {
+      Serial.println("Battery Check Triggered");
+      if (b.batteryLevel() < BATTERY_THRESHOLD) {
+          System.sleep(SLEEP_MODE_DEEP);
+      }
+      prev_time = millis();
     }
-    prev_time = millis();
   }
 };
 
