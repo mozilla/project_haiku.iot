@@ -31,7 +31,7 @@ void confirmHandShake(const char *event, const char *data){
 void handleEvent(const char *event, const char *data)
 {
    // Vibrate
-   b.vibrate(400);
+   b.vibrate(200);
   // Compare the data returned with event and handle accordingly
   // This could be used to pass click, hold, or double click states
   if (strcmp(data,"click")==0) {
@@ -121,11 +121,11 @@ void loop() {
       char batteryBuffer[60];
       sprintf(batteryBuffer, "%5.2f", batteryLevel);
       Particle.publish(BATTERY_LEVEL_EVENT,String(batteryBuffer), 60, PRIVATE);
-      // Uncomment code below to put device in sleep mode
-      // when battery level is below  BATTERY_THRESHOLD
-      //if (batteryLevel < BATTERY_THRESHOLD) {
-      //    System.sleep(SLEEP_MODE_DEEP);
-      //}
+      // Put device in sleep mode when battery level
+      // is below BATTERY_THRESHOLD
+      if (batteryLevel < BATTERY_THRESHOLD) {
+        System.sleep(SLEEP_MODE_DEEP);
+      }
       prev_time = millis();
     }
   #endif
