@@ -1,0 +1,52 @@
+<html>
+<head><title>Voltage Divide - ADC and back</title>
+</head>
+
+<body>
+<p><label>Vin: <input type="text" id="value_Vin"></label></p>
+<p><label>voltage presented to analog pin after voltage divider <input type="text" id="value_div" readonly=""></label><p>
+<p><label>analogRead value (0:4095) <input type="text" id="value_adc" readonly=""></label></p>
+<p><label>Round trip: Vin<input type="text" id="value_Vin2" readonly=""></label></p>
+<button id="calc_btn">Calculate</button>
+<script>
+var r1 = 47000;
+var r2 = 33000;
+
+function _solveForVin(a_) {
+  a = a_ * 1/4096 * 3.3;
+  return a/(r2 / (r1 + r2));
+}
+
+function voltageDivider(Vin) {
+  var a = (r2 / (r1 + r2)) * Vin;
+  return a;
+}
+
+function adc(Vin) {
+  return Vin/3.3 * 4096;
+}
+
+function solveForVin(a5) {
+  var coef = (r2 / (r1+r2)) / 3.3 * 4096;
+  return a5 / coef;
+}
+
+function calculate() {
+  var Vin = parseFloat(document.getElementById('value_Vin').value, 10);
+  if(isNaN(Vin) || Vin < 0) {
+    console.warn("Input should be a voltage value between 0 and 5");
+  }
+  var divided = voltageDivider(Vin);
+  document.getElementById('value_div').value = divided;
+  var analog = adc(divided);
+  document.getElementById('value_adc').value = analog;
+  var Vin2 = solveForVin(analog);
+  document.getElementById('value_Vin2').value = Vin2;
+}
+
+window.onload = function() {
+  document.getElementById('calc_btn').addEventListener('click', calculate);
+}
+</script>
+</body>
+</html>
