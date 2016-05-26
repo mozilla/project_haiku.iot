@@ -38,3 +38,8 @@ Vendor links are just a suggestion. You may want to adjust based on what you can
 * Enter your home WiFi password in the Password field. Then click Connect button. Your device should blink green to let you know it’s trying to connect to the internet. An alert will show with help instruction in case you entered wrong password. Press OK.
 
 * Give your device a few seconds to connect and start blinking light blue. When it is blinking light blue, your device is happily connected to the Internet!
+
+### Operating Instructions
+
+#### Reset to remove stored WiFi data from device
+To wipe any stored WiFi credentials on the device, hold the MODE button for about ten seconds, until the RGB LED blinks blue rapidly.
