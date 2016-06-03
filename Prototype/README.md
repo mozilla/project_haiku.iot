@@ -20,6 +20,21 @@ Vendor links are just a suggestion. You may want to adjust based on what you can
 * Mini USB Cable - A to Mini B [Amazon](http://www.amazon.com/StarTech-com-Mini-USB-Cable-USB2HABM6RA/dp/B004NO0L4O)
 * Hookup wire for all the connections. E.g. [Adafruit](https://www.adafruit.com/products/1311)
 
+### Building the Prototype Device
+
+#### 3D Printing the enclosure
+
+The OpenSCAD source file and print-ready [enclosure.stl](assets/3d/enclosure.stl) are in the [Prototype/assets/3d](assets/3d) directory. We used white ABS with a normal "regular quality" print profile: 0.25mm layer height, 1mm shell, no brim or other supports.
+
+#### Assembling the Electronics
+
+Most parts are off the shelf. If creating the device on the breadboard you can simply wire it up with jumper wires. To fit into the enclosure, you will need to cut down a piece of strip board to 6 columns and ~14 rows. The videos below walk through wiring it all up and getting it into the enclosure.
+
+* [Wiring diagram](assets/BlinkyButton_bb.png)
+* [Walkthrough video 1/3](https://www.youtube.com/watch?v=C2MHg81-BwQ) - First stage of assembling the device, wiring up the Particle Photon board and the LiPo charging board2.
+* [Walkthrough video 2/3](https://youtu.be/lktK18RHnlE) - Completing wiring
+* [Walkthrough video 3/3](https://youtu.be/VAnI2gIuZO8) - Packing the enclosure
+
 
 ### Connecting to WiFi
 
