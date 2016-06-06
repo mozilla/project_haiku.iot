@@ -55,9 +55,9 @@ Click on Libraries button, and find BlingButton in Community Libraries. Select B
 Go back to your created app ‘buzzy-pixel’, and paste following code inside the ino file.
 https://github.com/mozilla/project_haiku.iot/blob/master/Prototype/InternetButton/buzzy-pixel/buzzy-pixel.ino
 
-Note: With WebIDE after including BlingButton library in your app, update reference in above buzzy-pixel.ino code from
-#include "BlingButton.h" -> #include "BlingButton/BlingButton.h"
-#include "Page.h" -> #include "BlingButton/Page.h"
+Note: With WebIDE after including BlingButton library in your app, update include reference in above buzzy-pixel.ino code from
+"BlingButton.h" -> "BlingButton/BlingButton.h"
+"Page.h" -> "BlingButton/Page.h"
 
 Add new file by clicking on ‘+’ on top right. Rename the file as ‘ButtonConfig.h’ [You can delete the corresponding cpp file created by default]
 
