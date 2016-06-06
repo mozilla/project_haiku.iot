@@ -48,20 +48,17 @@ Most parts are off the shelf. If creating the device on the breadboard you can s
 
 ##### Configure
 
-Go to https://build.particle.io, and click on Create New App and name it ‘buzzy-pixel’ and hit save icon on left. This should create a new file buzzy-pixel.ino.
-
-Click on Libraries button, and find BlingButton in Community Libraries. Select BlingButton library, and click on INCLUDE IN APP.
-
-Go back to your created app ‘buzzy-pixel’, and paste following code inside the ino file.
+* Go to https://build.particle.io, and click on Create New App and name it ‘buzzy-pixel’ and hit save icon on left. This should create a new file buzzy-pixel.ino.
+* Click on Libraries button, and find BlingButton in Community Libraries. Select BlingButton library, and click on Include In App.
+* Go back to your created app ‘buzzy-pixel’, and paste following code inside the ino file.
 https://github.com/mozilla/project_haiku.iot/blob/master/Prototype/InternetButton/buzzy-pixel/buzzy-pixel.ino
 
 Note: With WebIDE after including BlingButton library in your app, update include reference in above buzzy-pixel.ino code from
-"BlingButton.h" -> "BlingButton/BlingButton.h"
+"BlingButton.h" -> "BlingButton/BlingButton.h",  
 "Page.h" -> "BlingButton/Page.h"
 
-Add new file by clicking on ‘+’ on top right. Rename the file as ‘ButtonConfig.h’ [You can delete the corresponding cpp file created by default]
-
-Paste the below config settings code in ButtonConfig.h
+* Add new file by clicking on ‘+’ on top right. Rename the file as ‘ButtonConfig.h’ [You can delete the corresponding cpp file created by default]
+* Paste the below config settings code in ButtonConfig.h
 https://github.com/mozilla/project_haiku.iot/blob/master/Prototype/InternetButton/buzzy-pixel/ButtonConfig.h
 
 
@@ -72,7 +69,6 @@ ButtonConfig file settings are used to identify Device 1 and Device 2 in a pair.
 * For Device 2 in a pair PUBLISH_EVENT_NAME  should be set as "DEVICE_2_BUTTON_PRESS" and SUBSCRIBE_EVENT_NAME should be set as "DEVICE_1_BUTTON_PRESS.
 * BATTERY_CHECK flag in config file is used to trigger battery level check code . It ensures device goes to sleep if battery level is below the BATTERY_THRESHOLD.
 * BATTERY_CHECK_TIME flag sets the time interval after which you want to repeat battery level check.
-
 
 
 ##### Flash code
@@ -100,24 +96,17 @@ If it's blinking purple, and reboot to breathing cyan after a while, it should b
 
 
 
-### Operating Instructions
+#### Operating Instructions
 
 #### Connecting to WiFi
 
 * Make sure your WiFi is turned on. If phone: Tap Home > Settings > WiFi on your phone. If computer: do tap WiFi icon on your computer to choose a WiFi network.
-
 * Press SETUP button on your device for 3 seconds. This will put your device in Listening Mode and your device should begin blinking dark blue. When your device is in Listening Mode, it is waiting for you to connect it to WiFi.
-
 * Go to Home > Settings > Wifi and change to the Photon-XXXX network.
-
 * After connected to Photon-XXXX network, open browser and enter this URL http://192.168.0.1/index.html in a browser window.
-
 * Click the Scan button. A list of WiFi networks will show.
-
 * Press the option button for your home WiFi network.
-
 * Enter your home WiFi password in the Password field. Then click Connect button. Your device should blink green to let you know it’s trying to connect to the internet. An alert will show with help instruction in case you entered wrong password. Press OK.
-
 * Give your device a few seconds to connect and start blinking light blue. When it is blinking light blue, your device is happily connected to the Internet!
 
 #### Reset to remove stored WiFi data from device
