@@ -40,9 +40,9 @@ Most parts are off the shelf. If creating the device on the breadboard you can s
 
 ##### Setup Your Photon
 
-* To use Photon board, you need to setup your Photon. Particle provides plenty of options for registering your Photons with your local WiFi.  Recommended way to setup your photon is via Particle Mobile App, you'll have to create a particle account in order to manage your particle boards.
-* If you prefer command line tools, you'll need to have node.js and particle-cli installed on your computer.
-* Follow the quickstart instruction on photon website to create an particle account, connect your photon to wifi, and claim it under your account.
+* To use Photon board, you need to setup your Photon. Particle provides plenty of options for registering your Photons with your local WiFi.  Recommended way to setup your photon is via [Particle Mobile App](https://docs.particle.io/guide/getting-started/start/photon/#prerequisites-for-setup), you'll have to create a particle account in order to manage your particle boards.
+* If you prefer command line tools, you'll need to have [node.js](https://nodejs.org/) and [particle-cli](https://github.com/spark/particle-cli) installed on your computer.
+* Follow the [quickstart instruction](https://docs.particle.io/guide/getting-started/start/photon/#step-1-power-on-your-device) on photon website to create an particle account, connect your photon to wifi, and claim it under your account.
 * Please note both the devices in a pair should be claimed under the same particle account.
 
 
