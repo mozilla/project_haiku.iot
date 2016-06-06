@@ -1,6 +1,6 @@
-# smarthome.iot
+# project_haiku.iot
 
-#### Mozilla Smart Home
+#### Mozilla Project Haiku
 
 Learn about the Project Haiku (former Project Smart Home) on the Mozilla wiki
 * [https://wiki.mozilla.org/Connected_Devices/Projects/Project_Haiku](https://wiki.mozilla.org/Connected_Devices/Projects/Project_Haiku)
