@@ -53,9 +53,7 @@ Most parts are off the shelf. If creating the device on the breadboard you can s
 * Go back to your created app ‘buzzy-pixel’, and paste following code inside the ino file.
 https://github.com/mozilla/project_haiku.iot/blob/master/Prototype/InternetButton/buzzy-pixel/buzzy-pixel.ino
 
-Note: With WebIDE after including BlingButton library in your app, update include reference in above buzzy-pixel.ino code from 
-"BlingButton.h" -> "BlingButton/BlingButton.h",  
-"Page.h" -> "BlingButton/Page.h"
+Note: For accessing included BlingButton library, change include reference in above buzzy-pixel.ino code from "BlingButton.h" -> "BlingButton/BlingButton.h",  "Page.h" -> "BlingButton/Page.h"
 
 * Add new file by clicking on ‘+’ on top right. Rename the file as ‘ButtonConfig.h’ [You can delete the corresponding cpp file created by default]
 * Paste the below config settings code in ButtonConfig.h
@@ -98,7 +96,9 @@ If it's blinking purple, and reboot to breathing cyan after a while, it should b
 
 ### Operating Instructions
 
-#### Connecting to WiFi
+#### Connecting to WiFi network
+
+After device is flashed with buzzy-pixel code, you can connect to a different WiFi network (without captive portal) using below steps.
 
 * Make sure your WiFi is turned on. If phone: Tap Home > Settings > WiFi on your phone. If computer: do tap WiFi icon on your computer to choose a WiFi network.
 * Press SETUP button on your device for 3 seconds. This will put your device in Listening Mode and your device should begin blinking dark blue. When your device is in Listening Mode, it is waiting for you to connect it to WiFi.
