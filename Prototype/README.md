@@ -53,7 +53,7 @@ Most parts are off the shelf. If creating the device on the breadboard you can s
 * Go back to your created app ‘buzzy-pixel’, and paste following code inside the ino file.
 https://github.com/mozilla/project_haiku.iot/blob/master/Prototype/InternetButton/buzzy-pixel/buzzy-pixel.ino
 
-Note: With WebIDE after including BlingButton library in your app, update include reference in above buzzy-pixel.ino code from
+Note: With WebIDE after including BlingButton library in your app, update include reference in above buzzy-pixel.ino code from 
 "BlingButton.h" -> "BlingButton/BlingButton.h",  
 "Page.h" -> "BlingButton/Page.h"
 
@@ -67,7 +67,7 @@ https://github.com/mozilla/project_haiku.iot/blob/master/Prototype/InternetButto
 ButtonConfig file settings are used to identify Device 1 and Device 2 in a pair.
 * For Device 1  PUBLISH_EVENT_NAME  should be set as "DEVICE_1_BUTTON_PRESS" and SUBSCRIBE_EVENT_NAME should be "DEVICE_2_BUTTON_PRESS".
 * For Device 2 in a pair PUBLISH_EVENT_NAME  should be set as "DEVICE_2_BUTTON_PRESS" and SUBSCRIBE_EVENT_NAME should be set as "DEVICE_1_BUTTON_PRESS.
-* BATTERY_CHECK flag in config file is used to trigger battery level check code . It ensures device goes to sleep if battery level is below the BATTERY_THRESHOLD.
+* BATTERY_CHECK flag in config file is used to trigger [battery level check code](https://github.com/mozilla/smarthome.iot/blob/master/Prototype/InternetButton/buzzy-pixel/buzzy-pixel.ino#L116) . It ensures device goes to sleep if battery level is below the BATTERY_THRESHOLD.
 * BATTERY_CHECK_TIME flag sets the time interval after which you want to repeat battery level check.
 
 
@@ -96,7 +96,7 @@ If it's blinking purple, and reboot to breathing cyan after a while, it should b
 
 
 
-#### Operating Instructions
+### Operating Instructions
 
 #### Connecting to WiFi
 
