@@ -17,7 +17,6 @@ Vendor links are just a suggestion. You may want to adjust based on what you can
 * 12x12x7mm Momentary Tactile Push Button Switch 4 Pin DIP [Amazon](http://www.amazon.com/uxcell%C2%AE-12x12x7mm-Momentary-Button-Switch/dp/B009ERT2NQ)
 * 10K Ohm 1/4 watt resistor [Adafruit](https://www.adafruit.com/products/2784)
 * 33K and 47k resistors for voltage divider [Adafruit](https://www.adafruit.com/products/2786), [Amazon](http://www.amazon.com/Projects-25EP51433K0-33k-Resistors-Pack/dp/B0185FCAUY?ie=UTF8&psc=1&redirect=true&ref_=ox_sc_act_title_1&smid=ATVPDKIKX0DER)  or [Amazon](http://www.amazon.com/Projects-EPC-106-Value-Resistor-Kit/dp/B00NENE5WY?ie=UTF8&psc=1&redirect=true&ref_=oh_aui_detailpage_o02_s00)
-
 * Pancake vibration motor [Adafruit](https://www.adafruit.com/products/1201)
 * Mini USB Cable - A to Mini B [Amazon](http://www.amazon.com/StarTech-com-Mini-USB-Cable-USB2HABM6RA/dp/B004NO0L4O)
 * Ribbon wire for all the connections. E.g. [Sparkfun](https://www.sparkfun.com/products/10646)
