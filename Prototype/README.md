@@ -16,9 +16,21 @@ Vendor links are just a suggestion. You may want to adjust based on what you can
 * 3.7v 2000mAh Lithium Ion Battery [Adafruit](https://www.adafruit.com/products/2011) - note that shipping restrictions apply. Max 8 per order, no USPS delivery.
 * 12x12x7mm Momentary Tactile Push Button Switch 4 Pin DIP [Amazon](http://www.amazon.com/uxcell%C2%AE-12x12x7mm-Momentary-Button-Switch/dp/B009ERT2NQ)
 * 10K Ohm 1/4 watt resistor [Adafruit](https://www.adafruit.com/products/2784)
+* 33K and 47k resistors for voltage divider [Adafruit](https://www.adafruit.com/products/2786), [Amazon](http://www.amazon.com/Projects-25EP51433K0-33k-Resistors-Pack/dp/B0185FCAUY?ie=UTF8&psc=1&redirect=true&ref_=ox_sc_act_title_1&smid=ATVPDKIKX0DER)  or [Amazon](http://www.amazon.com/Projects-EPC-106-Value-Resistor-Kit/dp/B00NENE5WY?ie=UTF8&psc=1&redirect=true&ref_=oh_aui_detailpage_o02_s00)
+
 * Pancake vibration motor [Adafruit](https://www.adafruit.com/products/1201)
 * Mini USB Cable - A to Mini B [Amazon](http://www.amazon.com/StarTech-com-Mini-USB-Cable-USB2HABM6RA/dp/B004NO0L4O)
-* Hookup wire for all the connections. E.g. [Adafruit](https://www.adafruit.com/products/1311)
+* Ribbon wire for all the connections. E.g. [Sparkfun](https://www.sparkfun.com/products/10646)
+* Strip Board [Amazon](https://www.amazon.com/gp/product/B0076O73HQ/ref=oh_aui_detailpage_o00_s00?ie=UTF8&psc=1)
+
+Tools
+* Soldering Iron [Amazon](https://www.amazon.com/gp/product/B013JM4AW4/ref=oh_aui_detailpage_o08_s01?ie=UTF8&psc=1), Lead Solder [Sparkfun](https://www.sparkfun.com/products/9161) [Optional  [metal stand](https://www.sparkfun.com/products/9477) , [helping hand](http://www.amazon.com/SE-MZ101B-Helping-Magnifying-Glass/dp/B000RB38X8?ie=UTF8&psc=1&redirect=true&ref_=oh_aui_detailpage_o08_s00) ]
+* Wire Stripper [Sparkfun](https://www.sparkfun.com/products/12630) , Flush Cutters [Sparkfun](https://www.sparkfun.com/products/11952) 
+* Hot Glue gun or permanent glue to stick plastic parts
+* Enclosure 3d Printed using 3d printer or using vendors such as Shapeways
+
+
+
 
 ### Building the Prototype Device
 
@@ -48,15 +60,15 @@ Most parts are off the shelf. If creating the device on the breadboard you can s
 
 ##### Configure
 
-* Go to https://build.particle.io, and click on Create New App and name it ‘buzzy-pixel’ and hit save icon on left. This should create a new file buzzy-pixel.ino.
+* Go to https://build.particle.io, and click on Create New App and name it e.g. ‘buzzy-pixel’ and hit save icon on left. This should create a new file buzzy-pixel.ino.
 * Click on Libraries button, and find BlingButton in Community Libraries. Select BlingButton library, and click on Include In App.
-* Go back to your created app ‘buzzy-pixel’, and paste following code inside the ino file.
+* Go back to your created app ‘buzzy-pixel’, and paste following code inside the buzzy-pixel.ino file. 
 https://github.com/mozilla/project_haiku.iot/blob/master/Prototype/InternetButton/buzzy-pixel/buzzy-pixel.ino
 
 Note: For accessing included BlingButton library, change include reference in above buzzy-pixel.ino code from "BlingButton.h" -> "BlingButton/BlingButton.h",  "Page.h" -> "BlingButton/Page.h"
 
 * Add new file by clicking on ‘+’ on top right. Rename the file as ‘ButtonConfig.h’ [You can delete the corresponding cpp file created by default]
-* Paste the below config settings code in ButtonConfig.h
+* Paste the below config settings code in ButtonConfig.h 
 https://github.com/mozilla/project_haiku.iot/blob/master/Prototype/InternetButton/buzzy-pixel/ButtonConfig.h
 
 
@@ -77,7 +89,7 @@ Make sure both your photon devices are connected and breathing cyan.  By default
 * Click Verify button, It should compile code in the cloud and you should get code verified message on bottom left
 * Click Flash button, if it's blinking purple, and reboot to breathing cyan after a while, it should be working properly.
 
-Update ButtonConfig.h (See Understanding ButtonConfig) for Device 2 and repeat above three steps for Device 2. After flashing, devices should be communicating and sending ambient messages to paired device.
+Update ButtonConfig.h (See Understanding ButtonConfig) for Device 2 and repeat above three steps. After flashing, devices should be communicating and sending ambient messages to paired device.
 
 
 ##### Alternative: Flash with Command Line Tools
