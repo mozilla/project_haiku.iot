@@ -2,9 +2,12 @@
 
 This prototype will support of our next round of user research, in which we are investigating 1:1 communication with a simple physical device, built around the Particle "Photon" board.
 
+> This prototype was built for a specific purpose - to test a hypothesis and prompt feedback to help refine and steer development of products from Project Haiku. Please [contact the team](https://wiki.mozilla.org/Connected_Devices/Projects/Project_Haiku#Getting_in_touch) if you have suggestions or questions, or encounter problems building it.
+
 ### Overview
 
 The device connects over Wifi to Particle's cloud service where "messages" are exchanged between an identical "paired" device held by a friend. The device has a single button, and clicking/double-clicking/long-clicking on one results in a different LED animation on the other.
+
 
 ### Bill of Materials
 
@@ -24,7 +27,7 @@ Vendor links are just a suggestion. You may want to adjust based on what you can
 
 Tools
 * Soldering Iron [Amazon](https://www.amazon.com/gp/product/B013JM4AW4/ref=oh_aui_detailpage_o08_s01?ie=UTF8&psc=1), Lead Solder [Sparkfun](https://www.sparkfun.com/products/9161) [Optional  [metal stand](https://www.sparkfun.com/products/9477) , [helping hand](http://www.amazon.com/SE-MZ101B-Helping-Magnifying-Glass/dp/B000RB38X8?ie=UTF8&psc=1&redirect=true&ref_=oh_aui_detailpage_o08_s00) ]
-* Wire Stripper [Sparkfun](https://www.sparkfun.com/products/12630) , Flush Cutters [Sparkfun](https://www.sparkfun.com/products/11952) 
+* Wire Stripper [Sparkfun](https://www.sparkfun.com/products/12630) , Flush Cutters [Sparkfun](https://www.sparkfun.com/products/11952)
 * Hot Glue gun or permanent glue to stick plastic parts
 * Enclosure 3d Printed using 3d printer or using vendors such as Shapeways
 
@@ -61,13 +64,13 @@ Most parts are off the shelf. If creating the device on the breadboard you can s
 
 * Go to https://build.particle.io, and click on Create New App and name it e.g. ‘buzzy-pixel’ and hit save icon on left. This should create a new file buzzy-pixel.ino.
 * Click on Libraries button, and find BlingButton in Community Libraries. Select BlingButton library, and click on Include In App.
-* Go back to your created app ‘buzzy-pixel’, and paste following code inside the buzzy-pixel.ino file. 
+* Go back to your created app ‘buzzy-pixel’, and paste following code inside the buzzy-pixel.ino file.
 https://github.com/mozilla/project_haiku.iot/blob/master/Prototype/InternetButton/buzzy-pixel/buzzy-pixel.ino
 
 Note: For accessing included BlingButton library, change include reference in above buzzy-pixel.ino code from "BlingButton.h" -> "BlingButton/BlingButton.h",  "Page.h" -> "BlingButton/Page.h"
 
 * Add new file by clicking on ‘+’ on top right. Rename the file as ‘ButtonConfig.h’ [You can delete the corresponding cpp file created by default]
-* Paste the below config settings code in ButtonConfig.h 
+* Paste the below config settings code in ButtonConfig.h
 https://github.com/mozilla/project_haiku.iot/blob/master/Prototype/InternetButton/buzzy-pixel/ButtonConfig.h
 
 
