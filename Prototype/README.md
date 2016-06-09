@@ -106,7 +106,7 @@ Make sure you cd into the Prototype/InternetButton/buzzy-pixel directory, change
 
 If it's blinking purple, and reboot to breathing cyan after a while, it should be working. Change the ButtonConfig.h for Device 2 settings and flash Device 2.
 
-
+[Link to End to End instructions >>](https://drive.google.com/a/mozilla.com/file/d/0ByJ_mHuB-es3ckNXVHVpNDFPTUU/view)
 
 ### Operating Instructions
 
