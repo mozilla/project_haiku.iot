@@ -8,3 +8,4 @@
 *.swo
 .svn
 *~
+status-server/node_modules
