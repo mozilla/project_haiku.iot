@@ -3,17 +3,19 @@ var fs = require('fs');
 var bodyParser = require("body-parser");
 var path = require('path');
 var app = express();
+var serveIndex = require('serve-index');
+
+var dataDir = path.join(__dirname, '../data');
+var publicDir = path.join(__dirname, 'public');
 
 app.use(bodyParser.urlencoded({
   extended: false
 }));
 
-app.get('/', function (req, res) {
-  res.send('Hello World!');
-});
+app.use(express.static(publicDir));
 
 app.get('/status\.:ext?', function (req, res) {
-  var filename = path.join(__dirname, '../data/status');
+  var filename = path.join(dataDir, 'status');
   var ext = req.params.ext || '';
   fs.readFile(filename, function(err, buf) {
     if (err) {
@@ -44,7 +46,7 @@ app.get('/status\.:ext?', function (req, res) {
 });
 
 app.post('/status\.:ext?', function (req, res) {
-  var filename = path.join(__dirname, '../data/status');
+  var filename = path.join(dataDir, 'status');
   var ext = req.params.ext || '';
   var status = req.body.value;
   fs.writeFile(filename, status, function(err, buf) {
@@ -74,8 +76,10 @@ app.post('/status\.:ext?', function (req, res) {
   });
 });
 
+app.use(serveIndex(publicDir, {'icons': true}));
+
 app.listen(3000, function () {
-  console.log('Example app listening on port 3000!');
+  console.log('Status app listening on port 3000!');
 });
 
 function htmlResponse(ctxData) {
