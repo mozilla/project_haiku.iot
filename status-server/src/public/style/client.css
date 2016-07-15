@@ -1,0 +1,20 @@
+body {
+  background-color: #eee;
+}
+.container {
+  background-color: #333;
+  border: 1px solid #fff;
+  border-radius: 6px;
+  padding: 10px 20px;
+}
+
+.led {
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+  border: 1px dotted #999;
+  border-radius: 3px;
+  background-color: #000;
+  margin: 0 10px;
+}
+
