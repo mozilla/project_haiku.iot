@@ -41,3 +41,12 @@ For Mac, I had to copy using Terminal  cp -vX bootloader.hex /Volumes/MBED/
 * To run  BLE-Peripheral-SPI-LED, use LightBlue app to find BLE Nano peripheral ‘Arduino’ or 'LED' and select to connect. It should show one READWRITE service. Select Write new value and enter ‘00’ for turning LED off. Enter ‘01’ or any number other than 00 to turn LED on. You can see the output in serial monitor at baud rate 9600.  
 
 
+### OTA Application upload
+
+* Click Sketch -> Export Compiled Library. This will compile and create hex file in the same folder as respective ino file
+
+* Send the hex file using Airdrop to SmartPhone and use nRFToolBox app to open the hex file
+
+* Select the file in the app and the device to upload file to. Press reset button on the board and click upload in the app. Everytime, if you reset the board by hitting the button on the board, the bootloader will broacast the OTA service via BLE for 5 sec waiting for a connection to be made. Otherwise, it will start the pre-loaded firmware.
+
+[Link to Video](http://youtu.be/w5vUd6isJYQ) to update RBL nRF51822 OTA and and run BLE-Peripheral-SPI-LED

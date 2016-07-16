@@ -8,7 +8,7 @@
 #define BLE_RST   9
 
 // LED pin
-#define LED_PIN   13
+#define LED_PIN   4
 
 // create peripheral instance, see pinouts above
 BLEPeripheral            blePeripheral        = BLEPeripheral(BLE_REQ, BLE_RDY, BLE_RST);
@@ -35,8 +35,10 @@ void setup() {
   // add service and characteristic
   blePeripheral.addAttribute(ledService);
   blePeripheral.addAttribute(switchCharacteristic);
+  // You set switch characteristics value to 0 (default – LED off):
+  switchCharacteristic.setValue(0);
 
-  // begin initialization
+  // begin initialization and advertising the BLE service
   blePeripheral.begin();
 
   Serial.println(F("BLE LED Peripheral"));
