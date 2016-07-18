@@ -50,3 +50,19 @@ For Mac, I had to copy using Terminal  cp -vX bootloader.hex /Volumes/MBED/
 * Select the file in the app and the device to upload file to. Press reset button on the board and click upload in the app. Everytime, if you reset the board by hitting the button on the board, the bootloader will broacast the OTA service via BLE for 5 sec waiting for a connection to be made. Otherwise, it will start the pre-loaded firmware.
 
 [Link to Video](http://youtu.be/w5vUd6isJYQ) to update RBL nRF51822 OTA and and run BLE-Peripheral-SPI-LED
+
+
+## Steps to run BLE-Peripheral-NeoPixel
+
+* Install 1.0.5 RedBearLabs nRF51822 board using board manager: https://github.com/RedBearLab/nRF51822-Arduino#install-board-package-add-on.
+
+* Go to Sketch -> Include Library -> Manage Libraries. Search for Adafruit NeoPixel and install latest version 1.0.5. Installed library needs nRF51 board support to compile.
+See https://github.com/adafruit/Adafruit_NeoPixel/pull/42
+
+* Overwrite Adafruit_NeoPixel.cpp inside installed libraries at /Documents/Arduino/libraries/Adafruit_NeoPixel/ with [nRF51 Adafruit_Neopixel.cpp](https://github.com/mozilla/project_haiku.iot/tree/master/Bluetooth/nRF51822/Libraries/Adafruit_NeoPixel_nRF51/) file from here.
+
+* Open BLE-Peripheral-NeoPixel.ino file and upload the code to the respective board.
+
+* To run  BLE-Peripheral-SPI-LED, use LightBlue app to find BLE Nano peripheral device ‘Arduino’  and select to connect. It should show  READ-WRITE and  READ-NOTIFY services. Select READ-WRITE service and click on Write new value and enter ‘00’ for turning NeoPixel off. Enter ‘01’ or any number other than 00 to turn NeoPixel on. You can see the output in serial monitor at baud rate 9600.  Click on READ-NOTIFY service and start listening to notifications. Button press should send 0x01 and turn NeoPixel on. Release of button should send 0x00 and turn NeoPixel off.
+
+[Link to Video](http://youtu.be/LVIa5FvAGQE) to run BLE-Peripheral-NeoPixel on BLE Nano
