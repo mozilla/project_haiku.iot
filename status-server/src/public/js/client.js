@@ -1,47 +1,53 @@
-function pollStatus() {
-  if (window.XMLHttpRequest) { // Mozilla, Safari, ...
-    request = new XMLHttpRequest();
-  } else if (window.ActiveXObject) { // IE
-    try {
-      request = new ActiveXObject('Msxml2.XMLHTTP');
-    }
-    catch (e) {
-      try {
-        request = new ActiveXObject('Microsoft.XMLHTTP');
-      }
-      catch (e) {}
-    }
+var intervalID;
+var statusData = {};
+
+function startPolling() {
+  stopPolling();
+  intervalID = setInterval(requestStatus, 2000);
+}
+
+function stopPolling() {
+  if (intervalID) {
+    clearInterval(intervalID);
   }
-
-   // make a request to /status.json every 10s
- window.fetch('http://localhost:3000/status.json').then(function(response) {
-  //console.log(response.statusText);
-  var value;
-  document.getElementById("serverStatus").innerHTML = response.statusText;
-
-  response.json().then(function(json) {
-    console.log(json.value);
-     value= json.status.value;
-   });
-  updateStatus(response.statusText,value);
-});
-//  var intervalID = setInterval(function() { pollStatus(); }, 2000);
+  intervalID = null;
 }
 
-function updateStatus(currentresponse,value) {
+function requestStatus() {
+  // make a request to /status.json every 10s
+  window.fetch('http://localhost:3000/status.json?' + Date.now()).then(function(response) {
+    //console.log(response.statusText);
+    document.getElementById("serverStatus").innerHTML = response.statusText;
+
+    response.json().then(function(json) {
+      var didChange = updateStatus(json);
+      if (didChange) {
+        renderStatus();
+      }
+    });
+  });
+}
+
+function updateStatus(data) {
   // store updated value, did the value change?
-  window.fetch('http://localhost:3000/status.json').then(function(response) {
-   if (response.statusText == currentresponse){
-     var led = document.getElementById("led0");
-
-     console.log(led);
-     console.log(value);
-     //renderStatus(led,value);
-   }
- });
-  // call render if value or last-modified changed
+  console.log('updateStatus with data', data);
+  var value = data.value;
+  var didChange;
+  var lastModified = data['last-modified'];
+  if (value === statusData.value && lastModified == statusData.lastModified) {
+    didChange = false;
+  } else {
+    didChange = true;
+  }
+  statusData.value = value;
+  statusData.lastModified = lastModified;
+  return didChange;
 }
-function renderStatus(idx, value) {
+
+function renderStatus() {
+  console.log('renderStatus:', statusData);
   // could mock some LED sequ  ences here?
   // and/or just print the status value and last-modified date for now
+  var led = document.getElementById("led0");
+  console.log(led);
 }
