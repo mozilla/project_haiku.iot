@@ -14,7 +14,6 @@ body {
   display: inline-block;
   border: 1px dotted #999;
   border-radius: 3px;
-  background-color: #000;
+  /*background-color: #000;*/
   margin: 0 10px;
 }
-
