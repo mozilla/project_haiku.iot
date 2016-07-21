@@ -8,19 +8,18 @@
   <h1>Example status client</h1>
 
   <section class="container">
-    <canvas id="led0" class="led"></canvas>
-    <canvas id="led1" class="led"></canvas>
-    <canvas id="led2" class="led"></canvas>
-    <canvas id="led3" class="led"></canvas>
-    <canvas id="led4" class="led"></canvas>
+    <canvas id="led0" class="led" width=40 height=40></canvas>
+    <canvas id="led1" class="led" width=40 height=40></canvas>
+    <canvas id="led2" class="led" width=40 height=40></canvas>
+    <canvas id="led3" class="led" width=40 height=40></canvas>
+    <canvas id="led4" class="led" width=40 height=40></canvas>
   </section>
 
   <section class="container">
-    <pre style="width:100%; height: 5em; color: #eee">{
-      status goes here
-}</pre>
-<input type="button" value="Start / Stop"
-	onclick="startPolling();" /> Server status: <span id="serverStatus"></span>
+    <input type="button" value="Start"
+	         onclick="startPolling();" />
+    <input type="button" value="Stop"
+           onclick="stopPolling();" />
   </section>
   <script type="text/javascript">
   //led0
