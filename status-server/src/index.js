@@ -12,7 +12,6 @@ var config = {
   port: 3000,
   filename: 'status'
 };
-console.log('argv', argv);
 // mixin command-line args into our default config
 Object.keys(config).forEach(function(name) {
   if (name in argv) {
@@ -27,8 +26,9 @@ app.use(bodyParser.urlencoded({
 
 app.use(express.static(publicDir));
 
-app.get('/status\.:ext?', function (req, res) {
-  var filename = path.join(dataDir, config.filename);
+app.get('/status:num\.:ext?', function (req, res) {
+  var num = req.params.num || 0;
+  var filename = path.join(dataDir, 'status' + num);
   var ext = req.params.ext || '';
   fs.readFile(filename, function(err, buf) {
     if (err) {
@@ -48,7 +48,7 @@ app.get('/status\.:ext?', function (req, res) {
           break;
         case 'html':
           res.set('Content-Type', 'text/html');
-          res.send( htmlResponse({ name: 'status', value: status }));
+          res.send( htmlResponse({ url: req.path, name: 'status', value: status }));
           break;
         default:
           res.send(status);
@@ -58,8 +58,9 @@ app.get('/status\.:ext?', function (req, res) {
   });
 });
 
-app.post('/status\.:ext?', function (req, res) {
-  var filename = path.join(dataDir, config.filename);
+app.post('/status:num\.:ext?', function (req, res) {
+  var num = req.params.num || 0;
+  var filename = path.join(dataDir, 'status' + num);
   var ext = req.params.ext || '';
   var status = req.body.value;
   fs.writeFile(filename, status, function(err, buf) {
@@ -79,7 +80,7 @@ app.post('/status\.:ext?', function (req, res) {
           break;
         case 'html':
           res.set('Content-Type', 'text/html');
-          res.send( htmlResponse({ name: 'status', value: status }));
+          res.send( htmlResponse({ url: req.path, name: 'status', value: status }));
           break;
         default:
           res.send('OK');
@@ -100,7 +101,7 @@ function htmlResponse(ctxData) {
   '<html><head><title>%{name}</title></head>\n' +
   '<body>' +
   '<h1>%{name}: %{value}</h1>' +
-  '<form action="/status.html" method="POST">' +
+  '<form action="%{url}" method="POST">' +
   '<input name="value" value="%{value}">' +
   '<input type="submit" value="Update">' +
   '</form></body></html>';
