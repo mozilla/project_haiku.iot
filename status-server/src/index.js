@@ -3,10 +3,23 @@ var fs = require('fs');
 var bodyParser = require("body-parser");
 var path = require('path');
 var app = express();
+var argv = require('optimist').argv;
 var serveIndex = require('serve-index');
 
 var dataDir = path.join(__dirname, '../data');
 var publicDir = path.join(__dirname, 'public');
+var config = {
+  port: 3000,
+  filename: 'status'
+};
+console.log('argv', argv);
+// mixin command-line args into our default config
+Object.keys(config).forEach(function(name) {
+  if (name in argv) {
+    config[name] = argv[name];
+  }
+});
+console.log('config', config);
 
 app.use(bodyParser.urlencoded({
   extended: false
@@ -15,7 +28,7 @@ app.use(bodyParser.urlencoded({
 app.use(express.static(publicDir));
 
 app.get('/status\.:ext?', function (req, res) {
-  var filename = path.join(dataDir, 'status');
+  var filename = path.join(dataDir, config.filename);
   var ext = req.params.ext || '';
   fs.readFile(filename, function(err, buf) {
     if (err) {
@@ -46,7 +59,7 @@ app.get('/status\.:ext?', function (req, res) {
 });
 
 app.post('/status\.:ext?', function (req, res) {
-  var filename = path.join(dataDir, 'status');
+  var filename = path.join(dataDir, config.filename);
   var ext = req.params.ext || '';
   var status = req.body.value;
   fs.writeFile(filename, status, function(err, buf) {
@@ -78,8 +91,8 @@ app.post('/status\.:ext?', function (req, res) {
 
 app.use(serveIndex(publicDir, {'icons': true}));
 
-app.listen(3000, function () {
-  console.log('Status app listening on port 3000!');
+app.listen(config.port, function () {
+  console.log('Status app listening on port ' + config.port + '!');
 });
 
 function htmlResponse(ctxData) {
