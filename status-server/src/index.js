@@ -10,7 +10,7 @@ var dataDir = path.join(__dirname, '../data');
 var publicDir = path.join(__dirname, 'public');
 var config = {
   port: 3000,
-  filename: 'status'
+  filename: 'status0'
 };
 // mixin command-line args into our default config
 Object.keys(config).forEach(function(name) {

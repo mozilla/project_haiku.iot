@@ -9,11 +9,27 @@ body {
 }
 
 .led {
-  width: 40px;
-  height: 40px;
+  width: 20px;
+  height: 20px;
   display: inline-block;
   border: 1px dotted #999;
   border-radius: 3px;
   /*background-color: #000;*/
-  margin: 0 10px;
+  margin: 0 1px;
+}
+
+#visualization {
+  height: 400px;
+  background: #333 url('../images/hand.png') no-repeat -100px -40px;
+  background-size: 500px;
+  position: relative;
+}
+
+#band {
+  position: absolute;
+  top: 300px;
+  left: 85px;
+  width: 200px;
+  height: 46px;
+  transform: rotate(-12deg);
 }

@@ -7,19 +7,19 @@
 <body>
   <h1>Example status client</h1>
 
-  <section class="container">
-    <canvas id="led0" class="led" width=40 height=40></canvas>
-    <canvas id="led1" class="led" width=40 height=40></canvas>
-    <canvas id="led2" class="led" width=40 height=40></canvas>
-    <canvas id="led3" class="led" width=40 height=40></canvas>
-    <canvas id="led4" class="led" width=40 height=40></canvas>
+  <section class="container" id="visualization">
+    <div id="band">
+      <canvas id="led0" class="led" width=40 height=40></canvas>
+      <canvas id="led1" class="led" width=40 height=40></canvas>
+      <canvas id="led2" class="led" width=40 height=40></canvas>
+      <canvas id="led3" class="led" width=40 height=40></canvas>
+      <canvas id="led4" class="led" width=40 height=40></canvas>
+    </div>
   </section>
 
   <section class="container">
     <input type="button" value="Start"
-	         onclick="startPolling();" />
-    <input type="button" value="Stop"
-           onclick="stopPolling();" />
+	         onclick="togglePolling(this);" />
   </section>
   <script type="text/javascript">
   //led0
