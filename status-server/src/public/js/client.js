@@ -23,6 +23,16 @@ function stopPolling() {
   intervalID = null;
 }
 
+function togglePolling(btn) {
+  if (intervalID) {
+    stopPolling();
+    btn.value = "Start";
+  } else {
+    startPolling();
+    btn.value = "Stop";
+  }
+}
+
 function requestStatus() {
   var fetchResponses = Object.keys(statusItems).map(url => {
     // make a request to /status.json every 10s
