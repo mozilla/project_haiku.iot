@@ -29,9 +29,20 @@ Or, load /status.html and click 'Update' to set the field value as your new stat
 Multiple status
 ---------------
 
-To be able to work with two or more status, just you need to start the server with a specific status (eg: status1, status0) and different port.
-We know the default port is 3000, you can use 4000 for example to start the second one and sure in different terminal.
+To be able to work with two or more status, you can create status{n} files in the data directory (e.g. status0, status1) The /status route has been changed and now matches for /status0.json, /status1.json etc.
+
+Startup parameters
+------------------
+
+The port the server listens on defaults to 3000, but can be configured by passing a --port parameter, for example
 
 ```
-node src\index.js --filename port 4000
+node src/index.js --port 8080
 ```
+
+The filename prefix we use is 'status', i.e. the server expects to find files named status0, status1 etc in the data directory. That prefix can be changed using the --prefix parameter, for example:
+
+```
+node src/index.js --prefix foo
+```
+

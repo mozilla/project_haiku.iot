@@ -10,7 +10,7 @@ var dataDir = path.join(__dirname, '../data');
 var publicDir = path.join(__dirname, 'public');
 var config = {
   port: 3000,
-  filename: 'status0'
+  prefix: 'status'
 };
 // mixin command-line args into our default config
 Object.keys(config).forEach(function(name) {
@@ -26,9 +26,9 @@ app.use(bodyParser.urlencoded({
 
 app.use(express.static(publicDir));
 
-app.get('/status:num\.:ext?', function (req, res) {
+app.get('/'+config.prefix+':num\.:ext?', function (req, res) {
   var num = req.params.num || 0;
-  var filename = path.join(dataDir, 'status' + num);
+  var filename = path.join(dataDir, config.prefix + num);
   var ext = req.params.ext || '';
   fs.readFile(filename, function(err, buf) {
     if (err) {
@@ -58,9 +58,9 @@ app.get('/status:num\.:ext?', function (req, res) {
   });
 });
 
-app.post('/status:num\.:ext?', function (req, res) {
+app.post('/'+config.prefix+':num\.:ext?', function (req, res) {
   var num = req.params.num || 0;
-  var filename = path.join(dataDir, 'status' + num);
+  var filename = path.join(dataDir, 'prefix' + num);
   var ext = req.params.ext || '';
   var status = req.body.value;
   fs.writeFile(filename, status, function(err, buf) {
