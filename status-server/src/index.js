@@ -90,10 +90,6 @@ app.post('/'+config.prefix+':num\.:ext?', function (req, res) {
   });
 });
 
-app.post('/message:num\.:ext?', function (req, res) {
-  // send a rainbow message to user
-});
-
 app.use(serveIndex(publicDir, {'icons': true}));
 
 app.listen(config.port, function () {
