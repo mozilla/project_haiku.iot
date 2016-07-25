@@ -33,6 +33,24 @@ function togglePolling(btn) {
   }
 }
 
+function init() {
+  // update the main heading if this client instance was passed an id
+  if (config && config.id) {
+    var titleNode = document.querySelector('h1');
+    if (titleNode) {
+      titleNode.innerHTML = 'status client: ' + config.id;
+    }
+  }
+  // populate the LEDs with some initial colors
+  var colors = ['#ffff00', '#ffff00', '#00ffff', '#00ff07', '#772cb6'];
+  colors.forEach((color, idx) => {
+    var node = document.getElementById("led" + idx);
+    var ctx = node.getContext("2d");
+    ctx.fillStyle = color;
+    ctx.fillRect(0,0,300,300);
+  });
+}
+
 function requestStatus() {
   var fetchResponses = Object.keys(statusItems).map(url => {
     // make a request to /status.json every 10s
