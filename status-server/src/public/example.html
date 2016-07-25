@@ -21,32 +21,9 @@
     <input type="button" value="Start"
 	         onclick="togglePolling(this);" />
   </section>
-  <script type="text/javascript">
-  //led0
-  var c = document.getElementById("led0");
-  var ctx = c.getContext("2d");
-  ctx.fillStyle = "#ff00ff";
-  ctx.fillRect(0,0,300,300);
-  //led1
-  var c1 = document.getElementById("led1");
-  var ctx1 = c1.getContext("2d");
-  ctx1.fillStyle = "#ffff00";
-  ctx1.fillRect(0,0,300,300);
-  //led2
-  var c2 = document.getElementById("led2");
-  var ctx2 = c2.getContext("2d");
-  ctx2.fillStyle = "#00ffff";
-  ctx2.fillRect(0,0,300,300);
-  //led3
-  var c3 = document.getElementById("led3");
-  var ctx3 = c3.getContext("2d");
-  ctx3.fillStyle = "#00ff07";
-  ctx3.fillRect(0,0,300,300);
-  //led4
-  var c4 = document.getElementById("led4");
-  var ctx4 = c4.getContext("2d");
-  ctx4.fillStyle = "#772cb6";
-  ctx4.fillRect(0,0,300,300);
-  </script>
+<script src="./js/config.js"></script>
 <script src="./js/client.js"></script>
+<script type="text/javascript">
+  init();
+</script>
 </body></html>
