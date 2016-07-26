@@ -46,7 +46,9 @@ BLECharCharacteristic    readStatusCharacteristic = BLECharCharacteristic("fff2"
 BLEDescriptor readStatusDescriptor = BLEDescriptor("2901", "Read-BLE-Device-Status");
 
 const unsigned char initialStatus[BUF_LEN] = {0x11,0x11,0x11,0x11,0x11};
-char buttonValue = 0;
+int currentState;
+int debounceState;
+int buttonState = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -90,16 +92,27 @@ void loop() {
 
 void processButtonChange() {
   // read the current button pin state
-  buttonValue = digitalRead(BUTTON_PIN);
+  currentState = digitalRead(BUTTON_PIN);
+  delay(10);
+  debounceState = digitalRead(BUTTON_PIN);
 
-  // has the value changed since the last read
-  bool buttonChanged = (readStatusCharacteristic.value() != buttonValue);
-
-  if (buttonChanged) {
-    Serial.println("button value");
-    Serial.println(buttonValue, DEC);
-    readStatusCharacteristic.setValue(buttonValue);
-    renderStatus(buttonValue, 0);
+  if(currentState == debounceState) {
+    if(currentState != buttonState) {
+      if(currentState == LOW) {
+        // button released
+      } else {
+         // toggle the value since the last status
+        if(readStatusCharacteristic.value() == 0x00) {
+          readStatusCharacteristic.setValue(0x11);
+        } else {
+          readStatusCharacteristic.setValue(0x00);
+        }
+        Serial.println("button Status");
+        Serial.println(readStatusCharacteristic.value(),DEC);
+        renderStatus(readStatusCharacteristic.value(), 0);
+      }
+      buttonState = currentState;
+    }
   }
 }
 
@@ -124,12 +137,12 @@ void updateStatus(){
 }
 
 void renderStatus(int color, int pixel){
-  if (color == 1) {
-     // Turn neo pixel green and animate
-     animatePixels(strip, 0, 255, 0, pixel);
-  } else{
+  if (color == 0) {
      // Reset to red, off
      animatePixels(strip, 255, 0, 0, pixel);
+  } else {
+    // Turn neo pixel green and animate
+     animatePixels(strip, 0, 255, 0, pixel);
   }
  
 }
