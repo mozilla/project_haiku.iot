@@ -122,6 +122,13 @@ function requestStatus() {
      updateStatus(urlKey, data);
    });
    // ..then updating the rendering of each
+   var didChange = urlKeys.reduce((changed, key, idx) => {
+    var item = statusItems[key];
+    return changed || didChange;
+   }, false);
+   console.log('Incoming status change');
+   // TODO: could signal a change across the whole strip?
+
    urlKeys.forEach((urlKey, idx) => {
      renderStatus(urlKey);
    });
@@ -157,7 +164,7 @@ function renderStatus(urlKey) {
 
   if (statusData.didChange) {
     console.log('renderStatus:', urlKey, statusData);
-    // could mock some LED sequ  ences here?
+    // could mock some LED sequences here?
     // and/or just print the status value and last-modified date for now
     var led = document.getElementById("led"+idx).getContext('2d');
     var color;
@@ -175,5 +182,5 @@ function renderStatus(urlKey) {
     }
     led.fillStyle = color;
     led.fillRect(0,0,40,40);
-}
+  }
 }
