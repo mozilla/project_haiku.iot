@@ -36,13 +36,13 @@ BLEPeripheral            blePeripheral        = BLEPeripheral(BLE_REQ, BLE_RDY, 
 //  128-bit: "19b10010e8f2537e4f6cd104768a1214" (dashed format also supported)
 
 // create service
-BLEService               bleBuzzService           = BLEService("fff0");
+BLEService               bleBuzzService           = BLEService("0318e986-54b5-11e6-beb8-9e71128cae77");
 
 // create switch and button characteristic and one or more descriptors (optional)
-BLECharacteristic    pushStatusCharacteristic = BLECharacteristic("fff1", BLERead | BLEWrite, BUF_LEN);
+BLECharacteristic    pushStatusCharacteristic = BLECharacteristic("0318ef80-54b5-11e6-beb8-9e71128cae77", BLERead | BLEWrite, BUF_LEN);
 BLEDescriptor pushStatusDescriptor = BLEDescriptor("2901", "Push LED Status");
 
-BLECharCharacteristic    readStatusCharacteristic = BLECharCharacteristic("fff2", BLERead | BLENotify);
+BLECharCharacteristic    readStatusCharacteristic = BLECharCharacteristic("0318f084-54b5-11e6-beb8-9e71128cae77", BLERead | BLENotify);
 BLEDescriptor readStatusDescriptor = BLEDescriptor("2901", "Read-BLE-Device-Status");
 
 const unsigned char initialStatus[BUF_LEN] = {0x11,0x11,0x11,0x11,0x11};
