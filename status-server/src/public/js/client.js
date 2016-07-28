@@ -63,22 +63,15 @@ function animate(ct){
         console.console.warn("Error fetching"+ url, err);
       }
     );
-    Promise.all(fetchResponses).then(results => {
-           updateValueStatus(results,ct);
-          //blinkStatus(ct);
-    });
+           updateValueStatus(ct);
+
 }
 
-function updateValueStatus(results, ct){
-  var keys = Object.keys(statusItems);
-  var statusData;
-  results.forEach((data, idx) => {
-    if (idx == ct){
-      var Key = Keys[ct];
-      statusData = statusItems[Key];
+function updateValueStatus(ct){
+
+    var  statusData = statusItems[ct];
       console.log(statusData);
 
-    }
     var value = statusData.value;
     console.log(value);
     var didChange;
@@ -98,7 +91,7 @@ function updateValueStatus(results, ct){
     statusData.value = value;
     statusData.lastModified = Date.now();
     statusData.didChange = didChange;
-  });
+
 
 }
 function blinkStatus(ct){
