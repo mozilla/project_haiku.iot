@@ -63,41 +63,47 @@ function animate(ct){
         console.console.warn("Error fetching"+ url, err);
       }
     );
-
-
-   updateValueStatus(ct);
-   //blinkStatus(ct);
-
+    Promise.all(fetchResponses).then(results => {
+           updateValueStatus(results,ct);
+          //blinkStatus(ct);
+    });
 }
 
-function updateValueStatus(ct){
-  // var ch = '/status'+ct+'.json';
-  // console.log(ch);
-  // var statusUpdate = {ch: {} };
-  // console.log(statusUpdate);
-  // var urlKey = Object.keys(statusUpdate);
-  // console.log(urlKey);
-  // console.log(statusItems);
-  var statusData = statusItems['/status'+ct+'.json'];
-  console.log(statusData);
-  var value = statusData.value;
-  var didChange;
-  var lastModified = statusData['last-modified'];
-  if(value == 1){
-    value = 0;
-    didChange=true;
-  } else if (value === 0){
-    value =1;
-    didChange=true;
-  }else{
-    didChange = false;
-  }
-  statusData.value = value;
-  statusData.lastModified = Date.now();
-  statusData.didChange = didChange;
+function updateValueStatus(results, ct){
+  var keys = Object.keys(statusItems);
+  var statusData;
+  results.forEach((data, idx) => {
+    if (idx == ct){
+      var Key = Keys[ct];
+      statusData = statusItems[Key];
+      console.log(statusData);
+
+    }
+    var value = statusData.value;
+    console.log(value);
+    var didChange;
+    var lastModified = statusData['last-modified'];
+    if(value == 1){
+      console.log("changed to"+0);
+      value = 0;
+      didChange=true;
+    } else if (value === 0){
+      console.log("changed to"+1);
+      value =1;
+      didChange=true;
+    }else{
+      console.log("Didn't changed");
+      didChange = false;
+    }
+    statusData.value = value;
+    statusData.lastModified = Date.now();
+    statusData.didChange = didChange;
+  });
+
 }
 function blinkStatus(ct){
-    var statusData = statusItems['/status'+ct+'.json'];
+    var statusData = Object.keys('/status'+ct+'.json');
+    console.log(statusData);
     if (statusData.didChange) {
       console.log('render blink status:', '/status'+ct+'.json', statusData);
       var nodeSelected = document.getElementsByName("iframeS1").contentWindow.getElementById("led"+ct).getContext("2d");
