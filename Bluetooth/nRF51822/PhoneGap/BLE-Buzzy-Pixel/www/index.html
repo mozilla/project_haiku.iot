@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name = "format-detection" content = "telephone=no"/>
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1,
+         user-scalable=no, width=device-width">
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+        <title>BLE Buzzy Pixel</title>
+    </head>
+    <body>
+        <div id="connectionScreen">
+            <h1>BLE Buzzy Pixel</h1>
+            <ul id="deviceList">
+            </ul>
+            <button id="refreshButton">Refresh</button>
+        </div>
+
+        <div id="statusScreen">
+            <p> Enter BFF Status</p>
+            Status 1
+            <input type="text" value="17" id="status1"/>
+            Status 2
+            <input type="text" value="17" id="status2"/>
+            Status 3
+            <input type="text" value="17" id="status3"/>
+            Status 4
+            <input type="text" value="17" id="status4"/>
+            Status 5
+            <input type="text" value="17" id="status5"/>
+            <button id="updateButton">Update</button>
+
+            Status to be pushed: <div id="pushStatusText">
+                &nbsp;
+            </div>
+
+            Home BLE Device Status: <div id="readStatusText">
+                &nbsp;
+            </div>
+      
+            <button id="disconnectButton">Disconnect</button>
+        </div>
+        <div id="messageDiv"></div>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+    </body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "browser": true,
+  "devel": true,
+  "undef": true,
+  "unused": false,
+  "predef": [ "ble", "deviceList",
+    "connectionScreen", "colorScreen",
+    "refreshButton", "disconnectButton",
+    "red", "green", "blue",
+    "brightness", "powerSwitch",
+    "rgbText", "previewColor", "messageDiv" ]
+}
