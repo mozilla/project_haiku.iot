@@ -54,65 +54,28 @@ function init() {
 
   });
 }
-function animate(ct){
-  var fetchResponse = window.fetch('http://localhost:3000/status'+ct+'.json'+Date.now()).then(
+function sendClick(ct){
+  var fetchResponse = window.fetch('http://localhost:3000/status'+ct+'.json'+'?'+Date.now()).then(
       function onSuccess(response){
         return response.json();
       },
       function onError(err){
-        console.console.warn("Error fetching"+ url, err);
+        console.console.warn("Error fetching"+ 'http://localhost:3000/status'+ct+'.json', err);
       }
     );
-           updateValueStatus(ct);
+    fetchResponse.then(result => {
+     var urlKeys = Object.keys(statusItems);
+     // update each status (model)
+       var urlKey = urlKeys[ct];
+       updateStatus(urlKey, result);
+     // ..then updating the rendering of each
 
-}
-
-function updateValueStatus(ct){
-
-    var  statusData = statusItems[ct];
-      console.log(statusData);
-
-    var value = statusData.value;
-    console.log(value);
-    var didChange;
-    var lastModified = statusData['last-modified'];
-    if(value == 1){
-      console.log("changed to"+0);
-      value = 0;
-      didChange=true;
-    } else if (value === 0){
-      console.log("changed to"+1);
-      value =1;
-      didChange=true;
-    }else{
-      console.log("Didn't changed");
-      didChange = false;
-    }
-    statusData.value = value;
-    statusData.lastModified = Date.now();
-    statusData.didChange = didChange;
+       renderStatus(urlKey);
+   });
 
 
 }
-function blinkStatus(ct){
-    var statusData = Object.keys('/status'+ct+'.json');
-    console.log(statusData);
-    if (statusData.didChange) {
-      console.log('render blink status:', '/status'+ct+'.json', statusData);
-      var nodeSelected = document.getElementsByName("iframeS1").contentWindow.getElementById("led"+ct).getContext("2d");
-      var color;
-      switch (statusData.value) {
-        case '0':
-          color = 'red';
-          break;
-        case '1':
-          color = 'green';
-          break;
-      }
-      nodeSelected.fillStyle = color;
-      nodeSelected.fillRect(0,0,40,40);
-    }
-}
+
 function requestStatus() {
   var fetchResponses = Object.keys(statusItems).map(url => {
     // make a request to /status.json every 10s
@@ -127,56 +90,65 @@ function requestStatus() {
   });
 
   Promise.all(fetchResponses).then(results => {
-    updateStatus(results);
-    renderStatus();
-  });
+   var urlKeys = Object.keys(statusItems);
+   // update each status (model)
+   results.forEach((data, idx) => {
+     var urlKey = urlKeys[idx];
+     updateStatus(urlKey, data);
+   });
+   // ..then updating the rendering of each
+   urlKeys.forEach((urlKey, idx) => {
+     renderStatus(urlKey);
+   });
+});
 }
 
-function updateStatus(results) {
-  var urlKeys = Object.keys(statusItems);
-  results.forEach((data, idx) => {
-    var urlKey = urlKeys[idx];
-    var statusData = statusItems[urlKey];
+function updateStatus(urlKey, data) {
+  var statusData = statusItems[urlKey];
+  // the page can be loaded with a querystring like example.html?id=status1,
+  // the config.id is populated in config.js
+  var userId = urlKey.replace(/\/([^\.]+).json/, '$1');
+  // are we updating the status that represents ourself?
+  var isSelf = config && config.id === userId;
 
-    // store updated value, did the value change?
-    var value = data.value;
-    var didChange;
-    var lastModified = data['last-modified'];
-    if (value === statusData.value && lastModified == statusData.lastModified) {
-      didChange = false;
-    } else {
-      console.log('updateStatus with changed data', data);
-      didChange = true;
-    }
-    statusData.value = value;
-    statusData.lastModified = lastModified;
-    statusData.didChange = didChange;
-  });
+  // store updated value, did the value change?
+  var value = data.value;
+  var didChange;
+  var lastModified = data['last-modified'];
+  if (value === statusData.value && lastModified == statusData.lastModified) {
+    didChange = false;
+  } else {
+    console.log('updateStatus with changed data', data);
+    didChange = true;
+  }
+  statusData.value = value;
+  statusData.lastModified = lastModified;
+  statusData.didChange = didChange;
+  statusData.isSelf = isSelf;
 }
+function renderStatus(urlKey) {
+  var statusData = statusItems[urlKey];
+  var idx = Object.keys(statusItems).indexOf(urlKey);
 
-function renderStatus() {
-  Object.keys(statusItems).forEach((url, idx) => {
-    var statusData = statusItems[url];
-    if (statusData.didChange) {
-      console.log('renderStatus:', url, statusData);
-      // could mock some LED sequ  ences here?
-      // and/or just print the status value and last-modified date for now
-      var led = document.getElementById("led"+idx).getContext('2d');
-      var color;
-      switch (statusData.value) {
-        case ':-(':
-        case ':(':
-        case '0':
-          color = 'red';
-          break;
-        case ':-)':
-        case ':)':
-        case '1':
-          color = 'green';
-          break;
-      }
-      led.fillStyle = color;
-      led.fillRect(0,0,40,40);
+  if (statusData.didChange) {
+    console.log('renderStatus:', urlKey, statusData);
+    // could mock some LED sequ  ences here?
+    // and/or just print the status value and last-modified date for now
+    var led = document.getElementById("led"+idx).getContext('2d');
+    var color;
+    switch (statusData.value) {
+      case ':-(':
+      case ':(':
+      case '0':
+        color = 'red';
+        break;
+      case ':-)':
+      case ':)':
+      case '1':
+        color = 'green';
+        break;
     }
-  });
+    led.fillStyle = color;
+    led.fillRect(0,0,40,40);
+}
 }
