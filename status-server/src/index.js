@@ -60,7 +60,7 @@ app.get('/'+config.prefix+':num\.:ext?', function (req, res) {
 
 app.post('/'+config.prefix+':num\.:ext?', function (req, res) {
   var num = req.params.num || 0;
-  var filename = path.join(dataDir, 'prefix' + num);
+  var filename = path.join(dataDir, config.prefix + num);
   var ext = req.params.ext || '';
   var status = req.body.value;
   fs.writeFile(filename, status, function(err, buf) {
