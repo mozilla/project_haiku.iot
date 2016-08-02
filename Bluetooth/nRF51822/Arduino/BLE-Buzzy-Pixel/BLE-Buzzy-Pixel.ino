@@ -12,7 +12,7 @@
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 //   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
 
-#define PIXEL_COUNT 5    // The number of NeoPixels connected to the board. TODO:Move to Config.h
+#define PIXEL_COUNT 7   // The number of NeoPixels connected to the board. TODO:Move to Config.h
 #define PIXEL_PIN   5     // The pin connected to the input of the NeoPixels.
 #define PIXEL_TYPE  NEO_GRB + NEO_KHZ800  // The type of NeoPixels, see the NeoPixel
                                           // strandtest example for more options.
@@ -26,7 +26,7 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
 // Button pin
 #define BUTTON_PIN  6
-#define BUF_LEN         5 // TODO: Move to Config.h
+#define BUF_LEN         7 // TODO: Move to Config.h
 
 // create peripheral instance, see pinouts above
 BLEPeripheral            blePeripheral        = BLEPeripheral(BLE_REQ, BLE_RDY, BLE_RST);
@@ -45,10 +45,11 @@ BLEDescriptor pushStatusDescriptor = BLEDescriptor("2901", "Push LED Status");
 BLECharCharacteristic    readStatusCharacteristic = BLECharCharacteristic("0318f084-54b5-11e6-beb8-9e71128cae77", BLERead | BLENotify);
 BLEDescriptor readStatusDescriptor = BLEDescriptor("2901", "Read-BLE-Device-Status");
 
-const unsigned char initialStatus[BUF_LEN] = {0x11,0x11,0x11,0x11,0x11};
+const unsigned char initialStatus[BUF_LEN] = {0x01,0x01,0x01,0x01,0x01,0x01,0x01};
 int currentState;
 int debounceState;
 int buttonState = 0;
+int selfLED = 4; //TODO: Move to config.h
 
 void setup() {
   Serial.begin(9600);
@@ -103,13 +104,13 @@ void processButtonChange() {
       } else {
          // toggle the value since the last status
         if(readStatusCharacteristic.value() == 0x00) {
-          readStatusCharacteristic.setValue(0x11);
+          readStatusCharacteristic.setValue(0x01);
         } else {
           readStatusCharacteristic.setValue(0x00);
         }
         Serial.println("button Status");
         Serial.println(readStatusCharacteristic.value(),DEC);
-        renderStatus(readStatusCharacteristic.value(), 0);
+        renderStatus(readStatusCharacteristic.value(), selfLED);
       }
       buttonState = currentState;
     }
@@ -123,17 +124,16 @@ void pushStatusCharacteristicWritten(BLECentral& central, BLECharacteristic& cha
 void updateStatus(){
   //Get status array from the characteristic
   const unsigned char* status = pushStatusCharacteristic.value();
-  Serial.println(sizeof(status), DEC);
-    for(int i=0;i<= sizeof(status); i++) {
-      Serial.println(status[i], DEC);
-      if (status[i] == 0x11) {
-        Serial.println(F("LED on"));
-        renderStatus(1, i);
-      } else {
-        Serial.println(F("LED off"));
-        renderStatus(0, i);
-      }
+  for(int i=0;i<BUF_LEN; i++) {
+    Serial.println(status[i], DEC);
+    if (status[i] == 0x01) {
+      Serial.println(F("LED on"));
+      renderStatus(1, i);
+    } else {
+      Serial.println(F("LED off"));
+      renderStatus(0, i);
     }
+  }
 }
 
 void renderStatus(int color, int pixel){

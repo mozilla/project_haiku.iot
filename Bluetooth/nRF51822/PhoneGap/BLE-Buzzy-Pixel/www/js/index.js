@@ -16,7 +16,7 @@ var app = {
         deviceList.ontouchstart = app.connect;
         refreshButton.ontouchstart = app.scan;
         disconnectButton.ontouchstart = app.disconnect;
-        updateButton.ontouchstart = app.updateStatus;
+        updateButton.ontouchstart = app.updateStatusOnDevice;
         app.scan();
     },
     scan: function(e) {
@@ -70,11 +70,17 @@ var app = {
         statusScreen.hidden = false;
         app.setStatus("Connected.");
         app.syncUI();
+        togglePolling();
 
         ble.startNotification(peripheral.id, BLE_BUZZ_PIXEL_SERVICE, READ_DEVICE_STATUS,
         function(buffer) {
           var data = new Uint8Array(buffer);
+          var homeSlot = 'status' + selfLED;
+          homeSlot.value = data[0];
           readStatusText.innerText = data[0];
+          // Update self status in cloud
+          var status = data[0] ? 1 : 0;
+          postNewStatus(baseURL + selfURL, status);
         });
 
     },
@@ -84,47 +90,44 @@ var app = {
         app.setStatus("Disconnected.");
     },
     syncUI: function() {
-        // read values from BLE device and update the phone UI
+        // read values from BLE device and update the phone UI and pass updated status to cloud
         var id = app.connectedPeripheral.id;
         ble.read(id, BLE_BUZZ_PIXEL_SERVICE, READ_DEVICE_STATUS, function(buffer) {
           var data = new Uint8Array(buffer);
-          status1.value = data[0];
+          var homeSlot = 'status' + selfLED;
+          homeSlot.value = data[0];
           readStatusText.innerText = data[0];
+          // Update self status in cloud
+          var status = data[0] ? 1 : 0;
+          postNewStatus(baseURL + selfURL, status);
         });
     },
-    updateStatus: function (evt) {
-        app.updatePreview();
-        app.sendStatusToBLENano();
+    // Handle Status update from App Update button click
+    updateStatusOnDevice: function (evt) {
+        var value = new Uint8Array(ledLength);
+        for (var i in value) {
+          value[i] = window['status' + i].value;
+        }
+        app.sendStatusToBLENano(value);
     },
-    updatePreview: function() {
-        var s = app.getStatus();
-        //TODO: convert and display hex value
-        pushStatusText.innerText = "(" + s  + ")";
-    },
-    getStatus: function () {
-        var statusArrray = [];
-        statusArrray.push(status1.value);
-        statusArrray.push(status2.value);
-        statusArrray.push(status3.value);
-        statusArrray.push(status4.value);
-        statusArrray.push(status5.value);
-        return statusArrray.join('');
-    },
-    sendStatusToBLENano: function() {
-        var value = new Uint8Array(5);
-        value[0] = status1.value;
-        value[1] = status2.value;
-        value[2] = status3.value;
-        value[3] = status4.value;
-        value[4] = status5.value;
-        ble.write(app.connectedPeripheral.id, BLE_BUZZ_PIXEL_SERVICE, PUSH_COLOR_STATUS, value.buffer,
+    sendStatusToBLENano: function(arStatus) {
+        ble.write(app.connectedPeripheral.id, BLE_BUZZ_PIXEL_SERVICE, PUSH_COLOR_STATUS, arStatus.buffer,
             function() {
-                app.setStatus("Set status to " + app.getStatus());
+                for (var i in arStatus) {
+                  window['status' + i].value = arStatus[i];
+                }
             },
             function(error) {
                 app.setStatus("Error setting characteristic " + error);
             }
         );
+        ble.read(app.connectedPeripheral.id, BLE_BUZZ_PIXEL_SERVICE, PUSH_COLOR_STATUS, function(buffer) {
+          var data = new Uint8Array(buffer);
+          console.log('Buzzy-pixel updated status on device to');
+          for (var i in data) {
+            console.log(data[i]);
+          }
+        });
     },
     timeoutId: 0,
     setStatus: function(status) {
