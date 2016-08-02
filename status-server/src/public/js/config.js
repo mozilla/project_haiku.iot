@@ -3,7 +3,7 @@
   var config = global.config = {};
 
   // pull config from querystring
-  var expectedKeys = { id: true };
+  var expectedKeys = { id: true, autostart: true };
 
   var queryStr = location.search.substring(1);
   var pairs, nameValue, params = {};

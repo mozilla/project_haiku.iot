@@ -26,10 +26,14 @@ function stopPolling() {
 function togglePolling(btn) {
   if (intervalID) {
     stopPolling();
-    btn.value = "Start";
+    if(btn) {
+      btn.value = "Start";
+    }
   } else {
     startPolling();
-    btn.value = "Stop";
+    if (btn) {
+      btn.value = "Stop";
+    }
   }
 }
 
@@ -50,30 +54,51 @@ function init() {
     ctx.fillRect(0,0,300,300);
     ctx.font = "10px Arial";
     ctx.strokeText(idx ,node.width/2,node.height/2);
-
-
   });
+  if (config && config.autostart) {
+    togglePolling(document.getElementById('pollingBtn'));
+  }
 }
-function sendClick(ct){
-  var fetchResponse = window.fetch('http://localhost:3000/status'+ct+'.json'+'?'+Date.now()).then(
+function handleLEDClick(ct) {
+  var urlKey = '/status'+ct+'.json';
+  var userId = urlKey.replace(/\/([^\.]+)\.json/, '$1');
+  var isSelf = config && config.id === userId;
+  // NOTE: for now, click just means update status, and we can only update our own status
+  // so ignore clicks on other LEDs
+  if (isSelf) {
+    postNewStatus(urlKey);
+  } else {
+    console.log('Ignoring click on LED for '+userId+' that isnt the status of me: ' + config.id);
+  }
+}
+function postNewStatus(urlKey){
+  // logic is inverted here so an undefined/unknown status is set to '1' by default
+  var newStatusValue = statusItems[urlKey].value !== '1' ? '1' : '0';
+  window.fetch(urlKey, {
+    method: 'POST',
+    headers: new Headers({
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }),
+    body: "value="+newStatusValue
+  }).then(
       function onSuccess(response){
-        return response.json();
+        return response.json().then((result) => {
+          console.log('result: ', result);
+          if (result.ok) {
+            // update our local value when the server confirms the request was successful
+            //  temporary shim, the server should include the new value in the response
+            result.value = newStatusValue;
+            return updateStatus(urlKey, result);
+          }
+        });
       },
       function onError(err){
         console.console.warn("Error fetching"+ 'http://localhost:3000/status'+ct+'.json', err);
       }
-    );
-    fetchResponse.then(result => {
-     var urlKeys = Object.keys(statusItems);
-     // update each status (model)
-       var urlKey = urlKeys[ct];
-       updateStatus(urlKey, result);
-     // ..then updating the rendering of each
-
-       renderStatus(urlKey);
-   });
-
-
+    ).then(function() {
+      console.log('rendering in postNewStatus');
+      renderStatus(urlKey);
+    });
 }
 
 function requestStatus() {
@@ -107,7 +132,7 @@ function updateStatus(urlKey, data) {
   var statusData = statusItems[urlKey];
   // the page can be loaded with a querystring like example.html?id=status1,
   // the config.id is populated in config.js
-  var userId = urlKey.replace(/\/([^\.]+).json/, '$1');
+  var userId = urlKey.replace(/\/([^\.]+)\.json/, '$1');
   // are we updating the status that represents ourself?
   var isSelf = config && config.id === userId;
 
