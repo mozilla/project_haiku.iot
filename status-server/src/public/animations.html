@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Animations</title>
+  <link rel="stylesheet" href="./style/client.css">
+</head>
+<body>
+  <h1>Animations</h1>
+
+  <section class="container" id="visualization">
+    <div id="band">
+      <div id="led0" class="led" width=40 height=40></div>
+      <div id="led1" class="led" width=40 height=40></div>
+      <div id="led2" class="led" width=40 height=40></div>
+      <div id="led3" class="led" width=40 height=40></div>
+      <div id="led4" class="led" width=40 height=40></div>
+    </div>
+  </section>
+  <section class="container">
+    <button onclick="demoAnimation('breathe', {})">breathe</button>
+    <button onclick="demoAnimation('rainbow', {})">rainbow</button>
+    <button onclick="demoAnimation('hueHighlight', {})">hueHighlight</button>
+    <button onclick="demoAnimation('onOff', { pixels: [gPixels[2]] })">on/off</button>
+    <button onclick="demoAnimation('allOff'), {}">off</button>
+    |
+    <button onclick="plotAnimation(gAnimateState)"><em>Plot last animation</em></button>
+  </section>
+
+  <section class="container">
+    <canvas id="plot" width=500 height=300 style="margin: 10px 0"></canvas>
+  </section>
+
+<script src="./js/config.js"></script>
+<script src="./js/util.js"></script>
+<script src="./js/color.js"></script>
+<script src="./js/chart.js"></script>
+<script src="./js/easing.js"></script>
+<script src="./js/animation.js"></script>
+<script type="text/javascript">
+
+// page-specific
+// the animation library expects:
+//  a global render function to be defined
+//  a global pixels array to be defined - to hold Color instances
+
+function setPixelNodeColor(node, color) {
+  var colorStr;
+  if ('h' in color) {
+    // assume HSV
+    var hsvColor = color;
+    color = Color.HSVtoRGB(hsvColor);
+  }
+  var colorStr = 'rgb('+color.r.toFixed(0)+','+color.g.toFixed(0)+','+color.b.toFixed(0)+')';
+  node.style.backgroundColor = colorStr;
+}
+
+function paintPixels(pixels) {
+  var nodes = container.children;
+  for(var pixelIndex, i=0; i<pixels.length; i++) {
+    pixelIndex = pixels[i].index;
+    setPixelNodeColor(nodes[pixelIndex], pixels[i].color);
+  }
+}
+
+var container = document.getElementById("band");
+var PIXEL_COUNT=container.children.length;
+var gPixels = Array.map(container.children, (node, idx) => {
+  return {
+    index: idx,
+    color: new Color(0,0,0)
+  }
+});
+
+function demoAnimation(animName, config) {
+  animationManager.addAnimation( createAnimation(animName, config) );
+  animationManager.play();
+}
+// the init
+animationManager.addAnimation( createAnimation('allOff', { pixels: gPixels }) );
+animationManager.play();
+
+</script>
+</body></html>
