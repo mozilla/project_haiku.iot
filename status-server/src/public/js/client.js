@@ -1,13 +1,12 @@
 var intervalID;
 var statusItems = {
-  '/status0.json': {},  // statusData for each person
-  '/status1.json': {},  // statusData for each person
-  '/status2.json': {},  // statusData for each person
-  '/status3.json': {},  // statusData for each person
-  '/status4.json': {},  // statusData for each person
-  '/status5.json': {},  // statusData for each person
-  '/status6.json': {}  // statusData for each person
-
+  '/user/0/status': {}, 
+  '/user/1/status': {},
+  '/user/2/status': {},
+  '/user/3/status': {},
+  '/user/4/status': {},
+  '/user/5/status': {},
+  '/user/6/status': {}
 };
 
 function objectValues(obj) {
@@ -67,7 +66,7 @@ function init() {
   }
 }
 function handleLEDClick(ct) {
-  var urlKey = '/status'+ct+'.json';
+  var urlKey = '/user/'+ct+'/status';
   // NOTE: we'll actually need to match user id here once we have a proper way to represent users
   // for now I'm just checking the last character is the same digit
   var isSelf = config && config.id.endsWith(ct);
@@ -101,7 +100,7 @@ function postNewStatus(urlKey){
         });
       },
       function onError(err){
-        console.console.warn("Error fetching"+ 'http://localhost:3000/status'+ct+'.json', err);
+        console.console.warn("Error fetching"+ 'http://localhost:3000/user/'+ct+'/status', err);
       }
     ).then(function() {
       console.log('rendering in postNewStatus');
