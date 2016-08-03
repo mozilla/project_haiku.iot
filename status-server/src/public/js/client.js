@@ -40,6 +40,7 @@ function togglePolling(btn) {
 function init() {
   // update the main heading if this client instance was passed an id
   if (config && config.id) {
+    console.log('config.id: ', config.id)
     var titleNode = document.querySelector('h1');
     if (titleNode) {
       titleNode.innerHTML = 'status client: ' + config.id;
