@@ -3,15 +3,34 @@
 <head>
   <title>Example Side by Side client</title>
   <link rel="stylesheet" href="./style/client.css">
+  <link rel="stylesheet" href="./style/sideBySide.css">
+  <link rel="stylesheet" href="./style/user.css">
 </head>
 <body>
-
   <section>
 
-    <iframe src="example.html?id=status0&autostart=1" frameborder="0" scrolling="yes" height="600" align="left" name="iframeS0"> </iframe>
+  <div class="userContainer" id="user0">
+    <div class="userIcon"></div>
+    <iframe src="example.html?id=status0&autostart=1" frameborder="0" scrolling="yes" height="600" name="iframeS0"> </iframe>
+  </div>
 
-   <iframe src="example.html?id=status1&autostart=1" frameborder="0" scrolling="no"  height="600" align="right" name="iframeS1"></iframe>
+  <div class="userContainer" id="user1">
+    <div class="userIcon"></div>
+    <iframe src="example.html?id=status1&autostart=1" frameborder="0" scrolling="yes" name="iframeS0"> </iframe>
+  </div>
 
   </section>
 
+  <script src="./js/config.js"></script>
+  <script type="text/javascript">
+    var userColors = [];
+    if (!config.id) {
+      config.id ='user0';
+    }
+    Array.forEach(document.querySelectorAll('.userContainer'), (node) => {
+      if (node.id === config.id) {
+        node.classList.add('isSelf');
+      }
+    });
+  </script>
 </body></html>

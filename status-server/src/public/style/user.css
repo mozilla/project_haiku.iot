@@ -1,0 +1,20 @@
+.userIcon {
+  width: 50px;
+  height: 40px;
+  background: url(../images/animal-icons.png) no-repeat;
+  margin: 2px;
+  position: absolute;
+  left: 0;
+}
+#user0 .userIcon {
+  background-position: 0 0;
+}
+#user1 .userIcon {
+  background-position: -2px -38px;
+}
+#user2 .userIcon {
+  background-position: -2px -76px;
+}
+#user4 .userIcon {
+  background-position: -2px -120px;
+}
