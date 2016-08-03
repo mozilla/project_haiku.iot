@@ -1,10 +1,10 @@
 var intervalID;
 var statusItems = {
-  '/status0.json': {},  // statusData for each person
-  '/status1.json': {},  // statusData for each person
-  '/status2.json': {},  // statusData for each person
-  '/status3.json': {},  // statusData for each person
-  '/status4.json': {}  // statusData for each person
+  '/user/0/status.json': {},  // statusData for each person
+  '/user/1/status.json': {},  // statusData for each person
+  '/user/2/status.json': {},  // statusData for each person
+  '/user/3/status.json': {},  // statusData for each person
+  '/user/4/status.json': {}  // statusData for each person
 };
 
 function objectValues(obj) {
