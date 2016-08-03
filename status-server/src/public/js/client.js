@@ -39,11 +39,24 @@ function togglePolling(btn) {
 
 function init() {
   // update the main heading if this client instance was passed an id
-  if (config && config.id) {
+  if (config) {
+    // assign a default id if none was passed
+    if (!config.id) {
+      config.id = 'user0';
+    }
     var titleNode = document.querySelector('h1');
     if (titleNode) {
       titleNode.innerHTML = 'status client: ' + config.id;
     }
+    // temporarily map the user id to the led node just by aligning the indices.
+    // We'll want a proper slots=>users mapping eventually
+    Array.forEach(document.querySelectorAll('.led'), (node, idx) => {
+      var userId = node.id.replace(/^led([0-9])+/, 'user$1');
+      node.dataset.user = userId;
+      if (userId == config.id) {
+        node.classList.add('isSelf');
+      }
+    });
   }
   // populate the LEDs with some initial colors
   var colors = ['#ff00ff', '#ffff00', '#00ffff', '#00ff07', '#772cb6'];
