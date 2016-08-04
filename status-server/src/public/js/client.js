@@ -58,30 +58,22 @@ function init() {
       }
     });
   }
-  // populate the LEDs with some initial colors
-  var colors = ['#ff00ff', '#ffff00', '#00ffff', '#00ff07', '#772cb6'];
-  colors.forEach((color, idx) => {
-    var node = document.getElementById("led" + idx);
-    var ctx = node.getContext("2d");
-    ctx.fillStyle = color;
-    ctx.fillRect(0,0,300,300);
-    ctx.font = "10px Arial";
-    ctx.strokeText(idx ,node.width/2,node.height/2);
-  });
+
   if (config && config.autostart) {
     togglePolling(document.getElementById('pollingBtn'));
   }
 }
 function handleLEDClick(ct) {
   var urlKey = '/status'+ct+'.json';
-  var userId = urlKey.replace(/\/([^\.]+)\.json/, '$1');
-  var isSelf = config && config.id === userId;
+  // NOTE: we'll actually need to match user id here once we have a proper way to represent users
+  // for now I'm just checking the last character is the same digit
+  var isSelf = config && config.id.endsWith(ct);
   // NOTE: for now, click just means update status, and we can only update our own status
   // so ignore clicks on other LEDs
   if (isSelf) {
     postNewStatus(urlKey);
   } else {
-    console.log('Ignoring click on LED for '+userId+' that isnt the status of me: ' + config.id);
+    console.log('Ignoring click on LED for '+ct+' that isnt the status of me: ' + config.id);
   }
 }
 function postNewStatus(urlKey){
@@ -179,7 +171,7 @@ function renderStatus(urlKey) {
     console.log('renderStatus:', urlKey, statusData);
     // could mock some LED sequences here?
     // and/or just print the status value and last-modified date for now
-    var led = document.getElementById("led"+idx).getContext('2d');
+    //var led = document.getElementById("led"+idx);
     var color;
     switch (statusData.value) {
       case ':-(':
@@ -193,7 +185,7 @@ function renderStatus(urlKey) {
         color = 'green';
         break;
     }
-    led.fillStyle = color;
-    led.fillRect(0,0,40,40);
+    document.getElementById("led"+idx).style.backgroundColor = color;
+    //led.fillRect(0,0,40,40);
   }
 }

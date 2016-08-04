@@ -32,6 +32,12 @@ h1 {
   border: 1px solid #fff;
 }
 
+#led0 {background-color: #ff00ff;}
+#led1 {background-color: #ffff00;}
+#led2 {background-color: #00ffff;}
+#led3 {background-color: #00ff07;}
+#led4 {background-color: #772cb6;}
+
 #visualization {
   height: 400px;
   background: #333 url('../images/hand.png') no-repeat -100px -40px;
