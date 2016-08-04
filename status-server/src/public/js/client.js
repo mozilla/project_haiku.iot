@@ -65,14 +65,15 @@ function init() {
 }
 function handleLEDClick(ct) {
   var urlKey = '/status'+ct+'.json';
-  var userId = urlKey.replace(/\/([^\.]+)\.json/, '$1');
-  var isSelf = config && config.id === userId;
+  // NOTE: we'll actually need to match user id here once we have a proper way to represent users
+  // for now I'm just checking the last character is the same digit
+  var isSelf = config && config.id.endsWith(ct);
   // NOTE: for now, click just means update status, and we can only update our own status
   // so ignore clicks on other LEDs
   if (isSelf) {
     postNewStatus(urlKey);
   } else {
-    console.log('Ignoring click on LED for '+userId+' that isnt the status of me: ' + config.id);
+    console.log('Ignoring click on LED for '+ct+' that isnt the status of me: ' + config.id);
   }
 }
 function postNewStatus(urlKey){
