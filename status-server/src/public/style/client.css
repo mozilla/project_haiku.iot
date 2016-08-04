@@ -3,7 +3,7 @@ body {
 }
 
 h1 {
-  width: 100%;
+  width: 150px;
   height: 1.5rem;
   font-size: 1rem;
   font-weight: normal;
@@ -15,7 +15,8 @@ h1 {
   background-color: #333;
   border: 1px solid #fff;
   border-radius: 6px;
-  padding: 10px 20px;
+  padding: 6px 12px;
+  width: 269px;
 }
 
 .led {
@@ -28,21 +29,22 @@ h1 {
   margin: 0 1px;
 }
 .led.isSelf {
-  margin: 0 10px;
+  margin: 0 3px;
   border: 1px solid #fff;
 }
 
 #visualization {
-  height: 400px;
+  height: 600px;
   background: #333 url('../images/hand.png') no-repeat -100px -40px;
   background-size: 500px;
   position: relative;
+  width: 269px;
 }
 
 #band {
   position: absolute;
-  top: 300px;
-  left: 65px;
+  top: 270px;
+  left: 72px;
   width: 200px;
   height: 46px;
   transform: rotate(-12deg);
