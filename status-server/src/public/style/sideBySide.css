@@ -5,7 +5,7 @@ body > section:first-child {
 .userContainer {
   flex-basis: 300px;
   position: relative;
-  padding: 5px;
+  padding: 5px 5px 3.5rem 5px;
   border: 3px solid #ccc;
   border-radius: 10px;
   margin: 0 10px;

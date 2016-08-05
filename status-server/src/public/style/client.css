@@ -14,7 +14,7 @@ h1 {
   font-weight: normal;
   z-index: 1;
   padding: 0.1rem 1rem;
-  margin: 0 2px 0 40px;
+  margin: 0 2px;
 }
 .container {
   background-color: #333;
@@ -34,8 +34,8 @@ h1 {
   margin: 0 1px;
 }
 .led.isSelf {
-  margin: 0 3px;
-  border: 1px solid #fff;
+  margin: 0 9px;
+  border: 3px solid #fff;
 }
 
 #led0 {background-color: #ff00ff;}
@@ -43,6 +43,8 @@ h1 {
 #led2 {background-color: #00ffff;}
 #led3 {background-color: #00ff07;}
 #led4 {background-color: #772cb6;}
+#led5 {background-color: #ff00ff;}
+#led6 {background-color: #ffff00;}
 
 #visualization {
   height: 600px;
@@ -55,8 +57,8 @@ h1 {
 #band {
   position: absolute;
   top: 270px;
-  left: 72px;
-  width: 200px;
+  left: 42px;
+  width: 240px;
   height: 46px;
   transform: rotate(-12deg);
 }
