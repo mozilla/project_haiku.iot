@@ -4,7 +4,10 @@ var statusItems = {
   '/status1.json': {},  // statusData for each person
   '/status2.json': {},  // statusData for each person
   '/status3.json': {},  // statusData for each person
-  '/status4.json': {}  // statusData for each person
+  '/status4.json': {},  // statusData for each person
+  '/status5.json': {},  // statusData for each person
+  '/status6.json': {}  // statusData for each person
+
 };
 
 function objectValues(obj) {
