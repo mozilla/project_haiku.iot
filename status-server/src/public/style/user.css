@@ -4,7 +4,9 @@
   background: url(../images/animal-icons.png) no-repeat;
   margin: 2px;
   position: absolute;
-  left: 0;
+  left: 50%;
+  margin-left: -56px;
+  bottom: 10px;
 }
 #user0 .userIcon {
   background-position: 0 0;
@@ -18,3 +20,18 @@
 #user4 .userIcon {
   background-position: -2px -120px;
 }
+
+.userContainer:not(.isSelf) > .userIcon::before {
+  content: 'friend';
+  display: block;
+  text-align: center;
+  font-style: italic;
+  padding: 10px 0 0 60px;
+}
+.userContainer.isSelf > .userIcon::before {
+  content: 'self';
+  display: block;
+  text-align: left;
+  font-style: italic;
+  padding: 10px 0 0 60px;
+ }
