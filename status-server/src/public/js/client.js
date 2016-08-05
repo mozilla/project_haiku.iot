@@ -1,6 +1,6 @@
 var intervalID;
 var statusItems = {
-  '/user/0/status': {}, 
+  '/user/0/status': {},
   '/user/1/status': {},
   '/user/2/status': {},
   '/user/3/status': {},
@@ -70,6 +70,7 @@ function handleLEDClick(ct) {
   // NOTE: we'll actually need to match user id here once we have a proper way to represent users
   // for now I'm just checking the last character is the same digit
   var isSelf = config && config.id.endsWith(ct);
+  console.log('isSelf: ', isSelf);
   // NOTE: for now, click just means update status, and we can only update our own status
   // so ignore clicks on other LEDs
   if (isSelf) {
@@ -82,7 +83,7 @@ function postNewStatus(urlKey){
   // logic is inverted here so an undefined/unknown status is set to '1' by default
   var newStatusValue = statusItems[urlKey].value !== '1' ? '1' : '0';
   window.fetch(urlKey, {
-    method: 'POST',
+    method: 'PUT',
     headers: new Headers({
       'Content-Type': 'application/x-www-form-urlencoded'
     }),
@@ -100,7 +101,7 @@ function postNewStatus(urlKey){
         });
       },
       function onError(err){
-        console.console.warn("Error fetching"+ 'http://localhost:3000/user/'+ct+'/status', err);
+        console.warn("Error fetching"+ 'http://localhost:3000/user/'+ct+'/status', err);
       }
     ).then(function() {
       console.log('rendering in postNewStatus');
@@ -147,7 +148,7 @@ function updateStatus(urlKey, data) {
   var statusData = statusItems[urlKey];
   // the page can be loaded with a querystring like example.html?id=status1,
   // the config.id is populated in config.js
-  var userNum = urlKey.replace(/([0-9]+)\.json/, '$1');
+  var userNum = urlKey.replace(/\/[^0-9]*([0-9]+)\/status/, '$1');
 
   // are we updating the status that represents ourself?
   var isSelf = config && config.id.endsWith(userNum);
