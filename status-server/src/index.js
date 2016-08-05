@@ -12,7 +12,10 @@ var config = {
   port: 3000
 };
 
-app.use(serveIndex(publicDir, {'icons': true}));
+// FIXME: disabling this temporarily as it is causing all non-GET requests
+// to return a 405 Method not allowed error
+// app.use(serveIndex(publicDir, {'icons': true}));
+
 app.use(bodyParser.urlencoded({
   extended: true
 }));
@@ -36,7 +39,7 @@ app.get('/user/:id/status', function (req, res) {
       }
 
       res.setHeader('Last-Modified', stats.mtime);
-      res.json({ 'last-modified': stats.mtime, ok: true });
+      res.json({ 'last-modified': stats.mtime, ok: true, value: buf.toString() });
     });
   });
 });
