@@ -128,24 +128,25 @@ function requestStatus() {
   });
 
   Promise.all(fetchResponses).then(results => {
-   var urlKeys = Object.keys(statusItems);
-   // update each status (model)
-   results.forEach((data, idx) => {
+    var urlKeys = Object.keys(statusItems);
+    // update each status (model)
+    results.forEach((data, idx) => {
      var urlKey = urlKeys[idx];
      updateStatus(urlKey, data);
-   });
-   // ..then updating the rendering of each
-   var didChange = urlKeys.reduce((changed, key, idx) => {
-    var item = statusItems[key];
-    return changed || didChange;
-   }, false);
-   console.log('Incoming status change');
-   // TODO: could signal a change across the whole strip?
-
-   urlKeys.forEach((urlKey, idx) => {
-     renderStatus(urlKey);
-   });
-});
+    });
+    // ..then updating the rendering of each
+    var didChange = urlKeys.reduce((changed, key, idx) => {
+      var item = statusItems[key];
+      return changed || item.didChange;
+    }, false);
+    if (didChange) {
+      console.log('Incoming status change');
+      urlKeys.forEach((urlKey, idx) => {
+       renderStatus(urlKey);
+      });
+    }
+    // TODO: could signal a change across the whole strip?
+  });
 }
 
 function updateStatus(urlKey, data) {
