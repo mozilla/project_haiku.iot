@@ -132,7 +132,6 @@ function requestStatus() {
       return changed || item.didChange;
     }, false);
     if (didChange) {
-      console.log('Incoming status change');
       urlKeys.forEach((urlKey, idx) => {
        renderStatus(urlKey);
       });
