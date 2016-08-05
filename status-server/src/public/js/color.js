@@ -1,38 +1,38 @@
 (function(exports) {
 
-  function Color(r,g,b) {
-    this.r = r || 0;
-    this.g = g || 0;
-    this.b = b || 0;
-  }
-  Color.prototype = Object.prototype;
-  Color.prototype.toString = function() {
-    return JSON.stringify({ r: this.r, g: this.g, b: this.b });
-  };
-  exports.Color = Color;
+var Color = exports.Color = {};
+Color.create = function (r,g,b) {
+  var color = Object.create(RGBColor);
+  color.r = r;
+  color.g = g;
+  color.b = b;
+  return color;
+};
+var RGBColor = exports.RGBColor = {
+  r: 0,
+  g: 0,
+  b: 0
+};
+var HSVColor = exports.HSVColor = {
+  h: -1,
+  s: 0,
+  v: 0
+};
+HSVColor.create = function(h,s,v) {
+  var color = Object.create(HSVColor);
+  color.h = h;
+  color.s = s;
+  color.v = v;
+  return color;
 
-  function HSVColor(h,s,v) {
-    this.h = h || 0;
-    this.s = s || 0;
-    this.v = v || 0;
-  }
-  HSVColor.prototype = Object.prototype;
-  HSVColor.prototype.toString = function() {
-    return JSON.stringify({ h: this.h, s: this.s, v: this.v });
-  };
-  exports.HSVColor = HSVColor;
-
-// r,g,b values are from 0 to 1
-// h = [0,360], s = [0,1], v = [0,1]
-//    if s == 0, then h = -1 (undefined)
-
+}
 Color.RGBtoHSV = function RGBtoHSV(r,g,b)
 {
   if (typeof r == 'object') {
     var rgb = r;
-    r = rgb.h;
-    g = rgb.s;
-    b = rgb.v;
+    r = rgb.r;
+    g = rgb.g;
+    b = rgb.b;
   }
   var hsv = { h: 0, s: 0, v: 0 };
   var min, max, delta;
@@ -74,7 +74,7 @@ Color.HSVtoRGB = function HSVtoRGB(h, s, v)
     s = hsv.s;
     v = hsv.v;
   }
-  var rgb = new Color(0,0,0);
+  var rgb = Color.create(0,0,0);
   var i;
   var f, p, q, t;
 

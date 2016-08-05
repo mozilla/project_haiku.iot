@@ -1,4 +1,8 @@
-function sampleColorAtTime(keyFrames, elapsedTime, duration) {
+(function(exports) {
+ "use strict";
+ var Animation = exports.Animation = {};
+
+function sampleColorAtTime(keyFrames, elapsedTime, duration, easingFn) {
   // elapsed time as a %age of total duration
   var progress = elapsedTime/duration * 100;
   var currKeyFrame, nextKeyFrame;
@@ -36,7 +40,7 @@ function sampleColorAtTime(keyFrames, elapsedTime, duration) {
     throw new Error('missing endColor at frame: '+ nextKeyFrame + ', progress: ' + progress);
   }
 
-  var easedProgress = gAnimateState.easingFn(elapsedKeyFrameTime, 0, 1, keyFrameDuration);
+  var easedProgress = easingFn(elapsedKeyFrameTime, 0, 1, keyFrameDuration);
   var easedRGB = vectorLerp(
     startColor,
     endColor,
@@ -44,63 +48,117 @@ function sampleColorAtTime(keyFrames, elapsedTime, duration) {
   );
   return easedRGB;
 }
+Animation.sampleColorAtTime = sampleColorAtTime;
 
 // the animation-specific update function
-function allOff(delta) {
-  var offColor = new Color(0,0,41);
-  for(var i=0; i<gAnimateState.pixels.length; i++) {
-    gAnimateState.pixels[i].color = offColor;
-  }
-  // just a single frame animation
-  gAnimateState.stopped = 1;
-}
+function allOff(delta, animateState, pixels) {
+  animateState.elapsedTime += delta;
 
-function getNearestPixelsIndices(count) {
-  var sign = 1;
-  var currIndex = gAnimateState.currPixelIndex || 0;
-  var distance = 0;
-  var nearestIndices = [];
-  count = Math.min(count, gPixels.length);
-  for(var i=0; i<count; i++) {
-    nearestIndices.push(wrap(currIndex + distance, gPixels.length));
-    if (distance >= 0) {
-      distance++;
+  var elapsedTime = clamp(animateState.elapsedTime, 0, animateState.duration);
+  if (elapsedTime >= animateState.duration) {
+    if (--animateState.iterationCount) {
+      // reset to start over at 0%
+      elapsedTime = animateState.elapsedTime = 0;
+    } else {
+      animateState.stopped = true;
+      return;
     }
-    distance *= -1;
   }
-  return nearestIndices;
+  var offColor = Object.create(RGBColor);
+  offColor.b = 41;
+  for(var i=0; i<pixels.length; i++) {
+    pixels[i].color = offColor;
+  }
 }
-// the animation-specific, key-frame example of an update function
-function linearKeyFrameAnimation(delta) {
-  gAnimateState.elapsedTime += delta;
-  if (gAnimateState.elapsedTime >= gAnimateState.duration) {
-    return;
-  }
-  var elapsedTime = clamp(gAnimateState.elapsedTime, 0, gAnimateState.duration);
 
-  // animate which pixels?
-  // var pixelIndices = getNearestPixelsIndices(gAnimateState.pixelCount || 1);
-  var pixels = gAnimateState.pixels;
-  var currPixelIndex = clamp(gAnimateState.currPixelIndex, 0, pixels.length-1);
+// animate a pixel's color through a set of key-framed values
+function keyFrameAnimation(delta, animateState, pixel) {
+  animateState.elapsedTime += delta;
+
+  var elapsedTime = clamp(animateState.elapsedTime, 0, animateState.duration);
+  if (elapsedTime >= animateState.duration) {
+    if (--animateState.iterationCount) {
+      // reset to start over at 0%
+      elapsedTime = animateState.elapsedTime = 0;
+    } else {
+      animateState.stopped = true;
+      return;
+    }
+  }
+  var color = sampleColorAtTime(animateState.keyFrames,
+                                elapsedTime,
+                                animateState.duration,
+                                animateState.easingFn);
+  pixel.color = color;
+}
+
+// the animation-specific, key-frame example of an update function
+function pixelGroupKeyFrameAnimation(delta, animateState, pixels) {
+  animateState.elapsedTime += delta;
+  var elapsedTime = clamp(animateState.elapsedTime, 0, animateState.duration);
+  if (elapsedTime >= animateState.duration) {
+    if (--animateState.iterationCount) {
+      // reset to start over at 0%
+      elapsedTime = animateState.elapsedTime = 0;
+      console.log('over duration, iterationCount now: ', animateState.iterationCount);
+    } else {
+      animateState.stopped = true;
+      // FIXME: do we never get to 100% this way?
+      console.log('over duration, stopping at: ', animateState.iterationCount);
+      return;
+    }
+  }
+
+  var centerPixelIndex = isNaN(animateState.centerPixelIndex) ?
+      0 : clamp(animateState.centerPixelIndex, 0, pixels.length-1);
   // each pixel is offset by some number of ms
-  var pixelTimeOffset = gAnimateState.pixelTimeOffset; // ms;
-  pixels.forEach((pixel, i) => {
-    var idx = pixel.index;
-    var distance = 1+Math.abs(idx - currPixelIndex);
-    var sign = idx >= currPixelIndex ? 1 : -1;
+  var pixelTimeOffset = animateState.pixelTimeOffset; // ms;
+  pixels.forEach((pixel, idx) => {
+    var distance = 1+Math.abs(idx - centerPixelIndex);
+    var sign = idx >= centerPixelIndex ? 1 : -1;
     var timeOffset = distance * sign * pixelTimeOffset;
-    var elapsedTime = wrap(gAnimateState.elapsedTime + timeOffset, gAnimateState.duration);
-    var color = sampleColorAtTime(gAnimateState.keyFrames,
+    var elapsedTime = wrap(animateState.elapsedTime + timeOffset, animateState.duration);
+    var color = sampleColorAtTime(animateState.keyFrames,
                                   elapsedTime,
-                                  gAnimateState.duration);
+                                  animateState.duration,
+                                  animateState.easingFn);
     pixel.color = color;
     // just capture for the current/center pixel
-    if (i === 0) {
-      gAnimateState.steps.push({
+    if (idx === 0) {
+      animateState.steps.push({
         time: elapsedTime,
         color: color
       });
     }
+  });
+}
+Animation.pixelGroupKeyFrameAnimation = pixelGroupKeyFrameAnimation;
+
+function eachPixel(delta, groupAnimateState, pixels) {
+  // update any animating pixels
+  // this is just a facade to update animations on the individual pixels
+  // and is expected to run continually until its explicitly stopped
+
+  pixels.forEach((pixel, i) => {
+    if (!pixel) {
+      // slots can be empty/unassigned
+      return;
+    }
+    var animation = pixel.animationStack.pop();
+    if (!animation) {
+      return;
+    }
+    animation.updateFn(delta, animation, pixel);
+
+    if (!animation.stopped) {
+      pixel.animationStack.push(animation);
+    } else {
+      console.log('eachPixel: %s: not restoring animation: ', i, animation);
+    }
+    animation.steps.push({
+      time: animation.elapsedTime,
+      color: pixel.color
+    });
   });
 }
 
@@ -109,77 +167,134 @@ var gAnimateStateDefaults = {
   prevTime: 0,
   elapsedTime: 0,
   duration: 1000,
-  currColor: new Color(0,0,0),
-  currPixelIndex: 2,
+  centerPixelIndex: 2,
   direction: 1,
   pixelTimeOffset: 100,
+  iterationCount: 1,
   easingFn: easeInOutQuad
 };
-var gAnimateState = null;
 
 // the animation loop
 function createAnimation(animName, config) {
   var animateState = Object.create(gAnimateStateDefaults);
   animateState.prevTime = animateState.startTime = Date.now();
+  // steps are just for charting/debugging
   animateState.steps = [];
   switch (animName) {
+    case 'available':
+      animateState.updateFn = keyFrameAnimation;
+      animateState.name = animName;
+      animateState.keyFrames = {
+        '0%': Color.create(0,103,32),
+        '50%': Color.create(0,153,32),
+        '100%': Color.create(0,103,32)
+      };
+      animateState.duration = 2500;
+      animateState.iterationCount = Infinity;
+      // TODO: also handle transition states, error states etc?
+      break;
+    case 'notAvailable':
+      animateState.updateFn = keyFrameAnimation;
+      animateState.name = animName;
+      animateState.keyFrames = {
+        '0%': Color.create(0,153,32),
+        '50%': Color.create(0,0,0),
+        '65%': Color.create(0,0,80),
+        '100%': Color.create(0,0,0)
+      };
+      animateState.duration = 2000;
+      animateState.iterationCount = 1;
+      break;
+    case 'connecting':
+      animateState.updateFn = keyFrameAnimation;
+      animateState.name = animName;
+      animateState.keyFrames = {
+        '0%': Color.create(51,51,153),
+        '50%': Color.create(153,204,255),
+        '100%': Color.create(51,51,153)
+      };
+      animateState.duration = 2000;
+      animateState.iterationCount = Infinity;
+      break;
+    case 'ledStatus':
+      animateState.updateFn = eachPixel;
+      animateState.name = animName;
+      animateState.iterationCount = Infinity;
+      break;
     case 'allOff':
+      animateState.duration = 1;
       animateState.updateFn = allOff;
+      animateState.name = animName;
+      break;
+    case 'initializing':
+      animateState.updateFn = pixelGroupKeyFrameAnimation;
+      animateState.name = animName;
+      animateState.easingFn = easeLinear;
+      animateState.keyFrames = {
+        '0%': HSVColor.create(30, 1, 255),
+        '100%': HSVColor.create(120, 1, 255)
+      };
+      animateState.currKeyFrame = '0%';
+      animateState.duration = 800;
+      animateState.pixelTimeOffset = 300;
+      animateState.iterationCount = Infinity;
       break;
     case 'breathe':
-      animateState.updateFn = linearKeyFrameAnimation;
+      animateState.updateFn = keyFrameAnimation;
+      animateState.name = animName;
       animateState.keyFrames = {
-        '0%': new Color(0,0,0),
-        '30%': new Color(0,103,32),
-        '50%': new Color(0,0,0),
-        '80%': new Color(0,103,32),
-        '100%': new Color(0,0,0)
+        '0%': Color.create(0,0,0),
+        '55%': Color.create(0,103,32),
+        '100%': Color.create(0,0,0),
       };
+      animateState.duration = 4000;
       animateState.currKeyFrame = '0%';
-      animateState.pixelTimeOffset = 0;
-      animateState.duration = 8000;
+      animateState.iterationCount = Infinity;
+      break;
+    case 'breatheAll':
+      animateState.updateFn = pixelGroupKeyFrameAnimation;
+      animateState.name = animName;
+      animateState.keyFrames = {
+        '0%': Color.create(0,0,0),
+        '55%': Color.create(0,103,32),
+        '100%': Color.create(0,0,0),
+      };
+      animateState.duration = 4000;
+      animateState.currKeyFrame = '0%';
+      animateState.iterationCount = Infinity;
       break;
     case 'rainbow':
-      animateState.updateFn = linearKeyFrameAnimation;
+      animateState.updateFn = pixelGroupKeyFrameAnimation;
+      animateState.name = animName;
       animateState.keyFrames = {
-        '0%': new Color(238, 130, 238),
-        '14.3%': new Color(255, 0, 0),
-        '28.6%': new Color(255, 165, 0),
-        '42.9%': new Color(255, 255, 0),
-        '57.1%': new Color(0, 128, 0),
-        '71.4%': new Color(0, 0, 255),
-        '85.7%': new Color(75, 0, 130),
-        '100%': new Color(238, 130, 238)
+        '0%': Color.create(238, 130, 238),
+        '14.3%': Color.create(255, 0, 0),
+        '28.6%': Color.create(255, 165, 0),
+        '42.9%': Color.create(255, 255, 0),
+        '57.1%': Color.create(0, 128, 0),
+        '71.4%': Color.create(0, 0, 255),
+        '85.7%': Color.create(75, 0, 130),
+        '100%': Color.create(238, 130, 238)
       };
+      animateState.centerPixelIndex = 3;
+      animateState.pixelTimeOffset = 500;
       animateState.currKeyFrame = '0%';
-      animateState.duration = 2000;
-      // animateState.frameIntervalTime = 2000/8;
+      animateState.duration = 1100;
       break;
-    case 'onOff':
-      // TODO: need different treatment to animate out from a point
-      // rather than cycle linearly across the strip of pixel
-      animateState.updateFn = linearKeyFrameAnimation;
+    case 'hueHighlight':
+      animateState.updateFn = pixelGroupKeyFrameAnimation;
+      animateState.name = animName;
+      animateState.easingFn = easeLinear;
       animateState.keyFrames = {
-        '0%': new Color(0, 0, 0),
-        '50%': new Color(0, 0, 255),
-        '100%': new Color(0, 0, 0)
+        '0%': HSVColor.create(150, 1, 255),
+        '20%': HSVColor.create(180, 1, 255),
+        '40%': HSVColor.create(255, 1, 255),
+        '60%': HSVColor.create(255, 0.5, 255),
+        '80%': HSVColor.create(255, 1, 255),
+        '100%': HSVColor.create(150, 0.5, 255)
       };
       animateState.currKeyFrame = '0%';
       animateState.duration = 1000;
-      break;
-    case 'hueHighlight':
-      animateState.updateFn = linearKeyFrameAnimation;
-      animateState.easingFn = easeLinear;
-      animateState.keyFrames = {
-        '0%': new HSVColor(150, 1, 255),
-        '20%': new HSVColor(180, 1, 255),
-        '40%': new HSVColor(255, 1, 255),
-        '60%': new HSVColor(255, 0.5, 255),
-        '80%': new HSVColor(255, 1, 255),
-        '100%': new HSVColor(150, 0.5, 255)
-      };
-      animateState.currKeyFrame = '0%';
-      animateState.duration = 2100;
       animateState.pixelTimeOffset = 300;
       break;
   }
@@ -188,12 +303,10 @@ function createAnimation(animName, config) {
       animateState[key] = config[key];
     }
   }
-  if (!(animateState.pixels && animateState.pixels.length)) {
-    animateState.pixels = gPixels;
-  }
   console.log('createAnimation: ', animateState);
   return animateState;
 }
+Animation.createAnimation = createAnimation;
 
 function plotAnimation(animateState) {
   var rSeries = [],
@@ -213,50 +326,6 @@ function plotAnimation(animateState) {
   chart.addSeries(bSeries, {lineColor: '#00f', dotColor: '#009'});
   chart.render();
 }
+Animation.plotAnimation = plotAnimation;
 
-var animationManager = {
-  stack: [],
-  prevTime: 0,
-  play: function() {
-    if (this.isPlaying) {
-      return;
-    }
-    this.prevTime = Date.now();
-    this.elapsedTime = 0;
-    this.rafId = window.requestAnimationFrame(this.onAnimationFrame.bind(this));
-    this.isPlaying = true;
-  },
-  onAnimationFrame: function() {
-    var now = Date.now();
-    var delta = now - this.prevTime;
-    this.elapsedTime += delta;
-    var animateState = window.gAnimateState = this.stack.pop();
-    if (animateState) {
-      animateState.updateFn(delta);
-      if (this.elapsedTime >= animateState.duration) {
-        if (animateState.iterationCount) {
-          animateState.iterationCount--;
-        } else {
-          animateState.stopped = true;
-        }
-      }
-      if (!animateState.stopped) {
-        this.stack.push(animateState);
-      }
-    }
-    if (this.stack.length) {
-      this.rafId = window.requestAnimationFrame(this.onAnimationFrame.bind(this));
-    } else {
-      this.isPlaying = false;
-      this.rafId = null;
-    }
-    this.prevTime = now;
-    paintPixels(gPixels);
-  },
-  addAnimation: function(animateState) {
-    this.stack.push(animateState);
-  },
-  replaceAnimation: function(animateState) {
-    this.stack[this.stack.length-1] = animateState;
-  }
-}
+})(window);

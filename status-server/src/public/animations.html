@@ -4,9 +4,7 @@
   <title>Animations</title>
   <link rel="stylesheet" href="./style/client.css">
 </head>
-<body>
-  <h1>Animations</h1>
-
+<body style="display: flex">
   <section class="container" id="visualization">
     <div id="band">
       <div id="led0" class="led" width=40 height=40></div>
@@ -14,19 +12,32 @@
       <div id="led2" class="led" width=40 height=40></div>
       <div id="led3" class="led" width=40 height=40></div>
       <div id="led4" class="led" width=40 height=40></div>
+      <div id="led5" class="led" width=40 height=40></div>
+      <div id="led6" class="led" width=40 height=40></div>
     </div>
   </section>
   <section class="container">
-    <button onclick="demoAnimation('breathe', {})">breathe</button>
-    <button onclick="demoAnimation('rainbow', {})">rainbow</button>
-    <button onclick="demoAnimation('hueHighlight', {})">hueHighlight</button>
-    <button onclick="demoAnimation('onOff', { pixels: [gPixels[2]] })">on/off</button>
-    <button onclick="demoAnimation('allOff'), {}">off</button>
-    |
-    <button onclick="plotAnimation(gAnimateState)"><em>Plot last animation</em></button>
+    <button onclick="playBreatheAll()">breathe all</button>
+    <button onclick="playHueHighlight()">hueHighlight</button>
+    <button onclick="playAllOff()">off</button>
+    <hr>
+    <button onclick="plotLastAnimation()"><em>Plot last animation</em></button>
+    <hr>
+    <button onclick="SlotsAnimationManager.changeState(SlotsAnimationManager.state.ACTIVE)">set ACTIVE state</button>
+    <button onclick="SlotsAnimationManager.changeState(SlotsAnimationManager.state.INACTIVE)">set INACTIVE state</button>
+
+    <p><label><input type="checkbox" onclick="testChangeSlotStatus(this, 0)">0: set status</label></p>
+    <p><label><input type="checkbox" onclick="testChangeSlotStatus(this, 1)">1: set status</label></p>
+    <p><label><input type="checkbox" onclick="testChangeSlotStatus(this, 2)">2: set status</label></p>
+    <p><label><input type="checkbox" onclick="testChangeSlotStatus(this, 3)">3: set status</label></p>
+    <p><label><input type="checkbox" onclick="testChangeSlotStatus(this, 4)">4: set status</label></p>
+    <p><label><input type="checkbox" onclick="testChangeSlotStatus(this, 5)">5: set status</label></p>
+    <button onclick="SlotsAnimationManager.playMessage('rainbow')">send rainbow</button>
+
   </section>
 
-  <section class="container">
+  <section class="container" style="display: none; position: absolute; top: 0">
+    <span style="float: right; cursor: hand; cursor: pointer" onclick="this.parentNode.style.display = 'none'">X</span>
     <canvas id="plot" width=500 height=300 style="margin: 10px 0"></canvas>
   </section>
 
@@ -36,12 +47,54 @@
 <script src="./js/chart.js"></script>
 <script src="./js/easing.js"></script>
 <script src="./js/animation.js"></script>
+<script src="./js/slots-animation-manager.js"></script>
 <script type="text/javascript">
+ "use strict";
 
-// page-specific
-// the animation library expects:
-//  a global render function to be defined
-//  a global pixels array to be defined - to hold Color instances
+function plotLastAnimation(idx) {
+  document.getElementById('plot').parentNode.style.display = '';
+  var mgr = SlotsAnimationManager;
+  mgr.stop();
+  var pixel = gSlots[isNaN(idx) ? 1 : idx];
+  Animation.plotAnimation(pixel.animationStack[pixel.animationStack.length-1]);
+}
+
+function playBreatheAll() {
+  var breatheAnimation = Animation.createAnimation('breatheAll', {});
+  var offAnimation = Animation.createAnimation('allOff', { duration: 1000 });
+  var stack = SlotsAnimationManager.animationStack;
+
+  stack.splice(0, stack.length, breatheAnimation, offAnimation);
+  console.log('preview breath animation, animationStack: ', stack.map(a => a.name));
+}
+
+function playRainbow() {
+  var animation = Animation.createAnimation('rainbow', {});
+  SlotsAnimationManager.animationStack.push(animation);
+}
+
+function playAllOff() {
+  var animation = Animation.createAnimation('allOff', { duration: 8000 });
+  SlotsAnimationManager.animationStack.push(animation);
+}
+
+function playHueHighlight() {
+  var hueAnimation = Animation.createAnimation('hueHighlight', {});
+  SlotsAnimationManager.animationStack.push(hueAnimation);
+
+}
+
+function testChangeSlotStatus(input, idx) {
+  var status = input.checked;
+  SlotsAnimationManager.changeSlotStatus(idx, status);
+}
+function syncStatusCheckboxState() {
+  var inputs = document.querySelectorAll('input[type="checkbox"]');
+  for(var i=0; i<inputs.length; i++) {
+    inputs[i].checked = gSlots.status == 1;
+  }
+}
+// ---
 
 function setPixelNodeColor(node, color) {
   var colorStr;
@@ -54,30 +107,24 @@ function setPixelNodeColor(node, color) {
   node.style.backgroundColor = colorStr;
 }
 
-function paintPixels(pixels) {
+function paintPixels() {
   var nodes = container.children;
-  for(var pixelIndex, i=0; i<pixels.length; i++) {
-    pixelIndex = pixels[i].index;
-    setPixelNodeColor(nodes[pixelIndex], pixels[i].color);
+  for(var i=0; i<gSlots.length; i++) {
+    setPixelNodeColor(nodes[i], gSlots[i].color);
   }
 }
+
+
+var gSlots = new Array(7);
+// pass in the slots array to initialize the animation manager
+SlotsAnimationManager.init(gSlots);
+// give it a render function to be called each tick
+SlotsAnimationManager.render = paintPixels;
 
 var container = document.getElementById("band");
-var PIXEL_COUNT=container.children.length;
-var gPixels = Array.map(container.children, (node, idx) => {
-  return {
-    index: idx,
-    color: new Color(0,0,0)
-  }
-});
 
-function demoAnimation(animName, config) {
-  animationManager.addAnimation( createAnimation(animName, config) );
-  animationManager.play();
-}
-// the init
-animationManager.addAnimation( createAnimation('allOff', { pixels: gPixels }) );
-animationManager.play();
+SlotsAnimationManager.start();
+syncStatusCheckboxState();
 
 </script>
 </body></html>
