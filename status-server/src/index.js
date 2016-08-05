@@ -59,7 +59,7 @@ app.put('/user/:id/status', function (req, res) {
       }
 
       res.setHeader('Last-Modified', stats.mtime);
-      res.json({ 'last-modified': stats.mtime, ok: true });
+      res.json({ 'last-modified': stats.mtime, ok: true, value: buf.toString() });
     });
   });
 });
