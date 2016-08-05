@@ -4,7 +4,10 @@ var statusItems = {
   '/status1.json': {},  // statusData for each person
   '/status2.json': {},  // statusData for each person
   '/status3.json': {},  // statusData for each person
-  '/status4.json': {}  // statusData for each person
+  '/status4.json': {},  // statusData for each person
+  '/status5.json': {},  // statusData for each person
+  '/status6.json': {}  // statusData for each person
+
 };
 
 function objectValues(obj) {
@@ -53,7 +56,7 @@ function init() {
     Array.forEach(document.querySelectorAll('.led'), (node, idx) => {
       var userId = node.id.replace(/^led([0-9])+/, 'user$1');
       node.dataset.user = userId;
-      if (userId == config.id) {
+      if (config && config.id.endsWith(idx)) {
         node.classList.add('isSelf');
       }
     });
@@ -145,9 +148,10 @@ function updateStatus(urlKey, data) {
   var statusData = statusItems[urlKey];
   // the page can be loaded with a querystring like example.html?id=status1,
   // the config.id is populated in config.js
-  var userId = urlKey.replace(/\/([^\.]+)\.json/, '$1');
+  var userNum = urlKey.replace(/([0-9]+)\.json/, '$1');
+
   // are we updating the status that represents ourself?
-  var isSelf = config && config.id === userId;
+  var isSelf = config && config.id.endsWith(userNum);
 
   // store updated value, did the value change?
   var value = data.value;
@@ -174,7 +178,7 @@ function renderStatus(urlKey) {
     // and/or just print the status value and last-modified date for now
     //var led = document.getElementById("led"+idx);
     var color;
-    switch (statusData.value) {
+    switch (statusData.value.trim()) {
       case ':-(':
       case ':(':
       case '0':
