@@ -24,7 +24,7 @@ app.use(express.static(publicDir));
 
 app.get('/user/:id/status', function (req, res) {
   var num = req.params.id || 0;
-  var filename = path.join(dataDir, 'status' + num);
+  var filename = path.join(dataDir, 'user', num, 'status');
 
   fs.readFile(filename, function (err, buf) {
     if (err) {
@@ -46,8 +46,8 @@ app.get('/user/:id/status', function (req, res) {
 
 app.put('/user/:id/status', function (req, res) {
   var num = req.params.id || 0;
-  var filename = path.join(dataDir, 'status' + num);
-  var status = req.body.status;
+  var filename = path.join(dataDir, 'user', num, 'status');
+  var status = req.body.value;
 
   fs.writeFile(filename, status, function (err, buf) {
     if (err) {
