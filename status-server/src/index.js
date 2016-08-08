@@ -49,7 +49,7 @@ app.put('/user/:id/status', function (req, res) {
   var filename = path.join(dataDir, 'user', num, 'status');
   var status = req.body.value;
 
-  fs.writeFile(filename, status, function (err, buf) {
+  fs.writeFile(filename, status, function (err) {
     if (err) {
       console.error(err.stack);
       return res.status(500).send('Error updating status!');
@@ -62,7 +62,7 @@ app.put('/user/:id/status', function (req, res) {
       }
 
       res.setHeader('Last-Modified', stats.mtime);
-      res.json({ 'last-modified': stats.mtime, ok: true, value: buf.toString() });
+      res.json({ 'last-modified': stats.mtime, ok: true, value: status });
     });
   });
 });
