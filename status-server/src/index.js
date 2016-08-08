@@ -3,7 +3,6 @@ var bodyParser = require('body-parser');
 var express = require('express');
 var fs = require('fs');
 var path = require('path');
-var serveIndex = require('serve-index');
 
 var app = express();
 var dataDir = path.join(__dirname, '../data');
@@ -32,38 +31,62 @@ app.get('/user/:id/status', function (req, res) {
       return res.status(500).send('Error reading status!');
     }
 
-    fs.stat(filename, function (err, stats) {
-      if (err) {
-        console.error(err.stack);
-        return res.status(500).send('Error reading status last-modified!');
-      }
+    res.setHeader('Content-Type', 'application/json');
+    res.send(buf.toString());
+  });
+});
 
-      res.setHeader('Last-Modified', stats.mtime);
-      res.json({ 'last-modified': stats.mtime, ok: true, value: buf.toString() });
-    });
+app.get('/user/:id/message', function (req, res) {
+  var num = req.params.id || 0;
+  var filename = path.join(dataDir, 'user', num, 'message');
+
+  fs.readFile(filename, function (err, buf) {
+    if (err) {
+      console.error(err.stack);
+      return res.status(500).send('Error reading message!');
+    }
+
+    res.setHeader('Content-Type', 'application/json');
+    res.send(buf.toString());
   });
 });
 
 app.put('/user/:id/status', function (req, res) {
   var num = req.params.id || 0;
   var filename = path.join(dataDir, 'user', num, 'status');
-  var status = req.body.value;
+  var data = JSON.stringify({
+    'last-modified': new Date(),
+    value: req.body.value
+  });
 
-  fs.writeFile(filename, status, function (err) {
+  fs.writeFile(filename, data, function (err) {
     if (err) {
       console.error(err.stack);
       return res.status(500).send('Error updating status!');
     }
 
-    fs.stat(filename, function (err, stats) {
-      if (err) {
-        console.error(err.stack);
-        return res.status(500).send('Error reading status last-modified!');
-      }
+    res.setHeader('Content-Type', 'application/json');
+    res.send(data);
+  });
+});
 
-      res.setHeader('Last-Modified', stats.mtime);
-      res.json({ 'last-modified': stats.mtime, ok: true, value: status });
-    });
+app.put('/user/:id/message', function (req, res) {
+  var num = req.params.id || 0;
+  var filename = path.join(dataDir, 'user', num, 'message');
+  var data = JSON.stringify({
+    'last-modified': new Date(),
+    value: req.body.value,
+    sender: req.body.sender
+  });
+
+  fs.writeFile(filename, data, function (err) {
+    if (err) {
+      console.error(err.stack);
+      return res.status(500).send('Error updating message!');
+    }
+
+    res.setHeader('Content-Type', 'application/json');
+    res.send(data);
   });
 });
 
