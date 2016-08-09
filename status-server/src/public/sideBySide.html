@@ -46,7 +46,7 @@
     if (!config.id) {
       config.id ='user0';
     }
-    Array.forEach(document.querySelectorAll('.userContainer'), (node) => {
+    Array.prototype.forEach.call(document.querySelectorAll('.userContainer'), (node) => {
       if (node.id === config.id) {
         node.classList.add('isSelf');
       }

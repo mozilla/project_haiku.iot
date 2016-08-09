@@ -52,7 +52,7 @@ function init() {
     }
     // temporarily map the user id to the led node just by aligning the indices.
     // We'll want a proper slots=>users mapping eventually
-    Array.forEach(document.querySelectorAll('.led'), (node, idx) => {
+    Array.prototype.forEach.call(document.querySelectorAll('.led'), (node, idx) => {
       var userId = node.id.replace(/^led([0-9])+/, 'user$1');
       node.dataset.user = userId;
       if (config && config.id.endsWith(idx)) {
