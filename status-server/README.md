@@ -34,7 +34,6 @@ Params:
  
 Returns a JSON object with the following fields: 
   - `last-modified` the last time the status was modified
-  - `ok` boolean value if successful 
   - `value` the current value of the status
   
 #### `PUT /user/:id/status`
@@ -49,5 +48,31 @@ Body:
 
 Returns a JSON object with the following fields: 
   - `last-modified` the last time the status was modified
-  - `ok` boolean value if successful 
   - `value` the current value of the status
+
+#### `GET /user/:id/message`
+
+Params:
+
+  - `id` user id
+   
+Returns a JSON object with the following fields: 
+  - `last-modified` the last time the message was modified
+  - `value` the current value of the message
+  - `sender` user id of sender
+    
+#### `PUT /user/:id/message`
+
+Params:
+
+  - `id` user id
+
+Body: 
+
+  - `message` the message to store
+  - `sender` the sender id
+
+Returns a JSON object with the following fields: 
+  - `last-modified` the last time the message was modified
+  - `value` the current value of the message
+  - `sender` user id of sender
