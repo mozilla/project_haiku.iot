@@ -17,6 +17,7 @@ Follow below commands to create cordova Android app. [Link with detail commands]
 * cd BLE-Buzzy-Pixel/
 * cordova platform add android
 * cordova plugin add cordova-plugin-ble-central
+* cordova plugin add <path to local cordova-plugin-fetch directory>
 * cordova platforms ls
 
 * install android studio which brings in android sdk http://developer.android.com/sdk/installing/index.html?pkg=studio
