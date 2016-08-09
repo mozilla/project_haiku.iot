@@ -51,6 +51,21 @@ app.get('/user/:id/message', function (req, res) {
   });
 });
 
+app.get('/user/:id/slots', function (req, res) {
+  var num = req.params.id || 0;
+  var filename = path.join(dataDir, 'user', num, 'slots');
+
+  fs.readFile(filename, function (err, buf) {
+    if (err) {
+      console.error(err.stack);
+      return res.status(500).send('Error reading message!');
+    }
+
+    res.setHeader('Content-Type', 'application/json');
+    res.send(buf.toString());
+  });
+});
+
 app.put('/user/:id/status', function (req, res) {
   var num = req.params.id || 0;
   var filename = path.join(dataDir, 'user', num, 'status');
