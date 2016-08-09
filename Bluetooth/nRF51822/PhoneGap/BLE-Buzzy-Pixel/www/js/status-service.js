@@ -32,7 +32,7 @@ function togglePolling(btn) {
 
 function postNewStatus(url, newStatusValue) {
   cordovaFetch(url, {
-    method: 'POST',
+    method: 'PUT',
     headers: {
       'Content-Type': 'application/json'
     },
