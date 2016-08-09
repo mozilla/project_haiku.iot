@@ -1,4 +1,4 @@
-# Bluetooth Low Engergy (BLE) technology
+# Bluetooth Low Energy (BLE) technology
 
 Arduino sketches to flash on RedBear Labs nRF51822 or BLE Nano board. Install Lightblue iOS app or the Android App - B-BLE to scan and debug BLE peripheral devices
 

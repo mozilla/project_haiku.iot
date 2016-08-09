@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+The MIT License (MIT)
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+  id="cordova-plugin-fetch"
+  version="0.1.0">
+
+    <name>Cordova Fetch</name>
+ 
+    <description>
+        HTTP networking plugin that brings the fetch() standard to Cordova
+	</description>
+
+    <engines>
+        <engine name="cordova" version=">=3.0.0" />
+    </engines>
+    <repo>https://github.com/aporat/cordova-plugin-fetch.git</repo>
+    <issue>https://github.com/aporat/cordova-plugin-fetch/issues</issue>
+    <license>MIT</license>
+
+    <keywords>cordova,phonegap,fetch,http,networking</keywords>
+
+    <js-module src="www/fetch.js" name="FetchPlugin">
+        <clobbers target="cordovaFetch" />
+    </js-module>
+
+    <!-- ios -->
+    <platform name="ios">
+    <config-file target="config.xml" parent="/*">
+            <feature name="FetchPlugin">
+                <param name="ios-package" value="FetchPlugin"/>
+            </feature>
+        </config-file>
+
+        <header-file src="src/ios/FetchPlugin.h" />
+        <source-file src="src/ios/FetchPlugin.m" />
+
+        <header-file src="src/ios/BaseClient.h" />
+        <source-file src="src/ios/BaseClient.m" />
+
+        <header-file src="src/ios/AFNetworking/AFHTTPSessionManager.h" />
+        <source-file src="src/ios/AFNetworking/AFHTTPSessionManager.m" />
+
+        <header-file src="src/ios/AFNetworking/AFNetworking.h" />
+
+        <header-file src="src/ios/AFNetworking/AFNetworkReachabilityManager.h" />
+        <source-file src="src/ios/AFNetworking/AFNetworkReachabilityManager.m" />
+
+        <header-file src="src/ios/AFNetworking/AFSecurityPolicy.h" />
+        <source-file src="src/ios/AFNetworking/AFSecurityPolicy.m" />
+
+        <header-file src="src/ios/AFNetworking/AFURLRequestSerialization.h" />
+        <source-file src="src/ios/AFNetworking/AFURLRequestSerialization.m" />
+
+        <header-file src="src/ios/AFNetworking/AFURLResponseSerialization.h" />
+        <source-file src="src/ios/AFNetworking/AFURLResponseSerialization.m" />
+
+        <header-file src="src/ios/AFNetworking/AFURLSessionManager.h" />
+        <source-file src="src/ios/AFNetworking/AFURLSessionManager.m" />
+
+        <header-file src="src/ios/AFNetworkActivityLogger/AFNetworkActivityLogger.h" />
+        <source-file src="src/ios/AFNetworkActivityLogger/AFNetworkActivityLogger.m" />
+
+        <framework src="Security.framework" />
+        <framework src="SystemConfiguration.framework" />
+    </platform>
+
+    <!-- android -->
+    <platform name="android">
+
+        <framework src="src/android/dependencies.gradle" custom="true" type="gradleReference" />
+
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="FetchPlugin" >
+                <param name="android-package" value="com.adobe.phonegap.fetch.FetchPlugin"/>
+            </feature>
+        </config-file>
+
+        <source-file src="src/android/com/adobe/phonegap/fetch/FetchPlugin.java" target-dir="src/com/adobe/phonegap/fetch/" />
+
+    </platform>
+
+
+</plugin>
