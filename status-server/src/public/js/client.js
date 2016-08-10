@@ -191,6 +191,14 @@ function renderStatus(urlKey) {
         break;
     }
     document.getElementById("led"+idx).style.backgroundColor = color;
-    //led.fillRect(0,0,40,40);
+
   }
+}
+function Buzz(m){
+  var audio = document.getElementById('buzz');
+  audio.load();
+  audio.play();
+  setTimeout(function() {
+  audio.pause();
+}, m);
 }
