@@ -8,4 +8,5 @@
     <access origin="*" />
     <preference name="Orientation" value="portrait" />
     <preference name="DisallowOverscroll" value="true"/>
+    <gap:plugin name="de.appplant.cordova.plugin.background-mode" version="0.6.3" />
 </widget>

@@ -12,6 +12,10 @@ var app = {
         statusScreen.hidden = true;
     },
     deviceready: function() {
+        // Enable background mode and create a notification so Android doesn't kill the app
+        cordova.plugins.backgroundMode.setDefaults({ text:'Scanning for notifications in the background'});
+        cordova.plugins.backgroundMode.enable();
+
         // wire buttons to functions
         deviceList.ontouchstart = app.connect;
         refreshButton.ontouchstart = app.scan;
