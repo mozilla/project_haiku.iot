@@ -10,20 +10,16 @@
   <section class="container" id="visualization">
     <div id="band">
       <audio id="buzz" src="sounds/DrainMagic.ogg"></audio>
-      <div id="led0" class="led" onclick="handleLEDClick(0);"></div>
-      <div id="led1" class="led" onclick="handleLEDClick(1);"></div>
-      <div id="led2" class="led" onclick="handleLEDClick(2);"></div>
-      <div id="led3" class="led" onclick="handleLEDClick(3);"></div>
-      <div id="led4" class="led" onclick="handleLEDClick(4);"></div>
-      <div id="led5" class="led" onclick="handleLEDClick(5);"></div>
-      <div id="led6" class="led" onclick="handleLEDClick(6);"></div>
+      <div id="myled" class="myled" onclick="toggleMyStatus();"></div>
+      <div id="led0" class="led" onclick="sendMessage(0);"></div>
+      <div id="led1" class="led" onclick="sendMessage(1);"></div>
+      <div id="led2" class="led" onclick="sendMessage(2);"></div>
+      <div id="led3" class="led" onclick="sendMessage(3);"></div>
+      <div id="led4" class="led" onclick="sendMessage(4);"></div>
+      <div id="led5" class="led" onclick="sendMessage(5);"></div>
     </div>
   </section>
 
-  <section class="container">
-    <input type="button" id="pollingBtn" value="Start"
-	         onclick="togglePolling(this);" />
-  </section>
 <script src="./js/config.js"></script>
 <script src="./js/client.js"></script>
 <script type="text/javascript">
