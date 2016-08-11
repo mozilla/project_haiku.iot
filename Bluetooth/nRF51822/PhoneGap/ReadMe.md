@@ -17,6 +17,7 @@ Follow below commands to create cordova Android app. [Link with detail commands]
 * cd BLE-Buzzy-Pixel/
 * cordova platform add android
 * cordova plugin add cordova-plugin-ble-central
+* cordova plugin add https://github.com/katzer/cordova-plugin-background-mode.git
 * cordova plugin add <path to local cordova-plugin-fetch directory>
 * cordova platforms ls
 
