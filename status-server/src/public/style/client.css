@@ -23,7 +23,19 @@ h1 {
   padding: 6px 12px;
   width: 269px;
 }
+.myled {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  border: 1px solid #333;
+  border-radius: 3px;
+  margin: 0 1px;
+}
 
+.myled.isSelf {
+  margin: 0 9px;
+  border: 3px solid #fff;
+}
 .led {
   width: 20px;
   height: 20px;
@@ -33,10 +45,6 @@ h1 {
   /*background-color: #000;*/
   margin: 0 1px;
 }
-.led.isSelf {
-  margin: 0 9px;
-  border: 3px solid #fff;
-}
 
 #led0 {background-color: #ff00ff;}
 #led1 {background-color: #ffff00;}
@@ -44,7 +52,6 @@ h1 {
 #led3 {background-color: #00ff07;}
 #led4 {background-color: #772cb6;}
 #led5 {background-color: #ff00ff;}
-#led6 {background-color: #ffff00;}
 
 #visualization {
   height: 600px;
