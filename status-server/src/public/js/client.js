@@ -27,12 +27,14 @@ an example of the slots array
 */
 
 function init() {
-  jsonRequest('GET', 'user/'+ config.id +'/status', function(err, data) {
-    if (err) {
+  fetch('user/'+ config.id +'/status').then(
+    function onSuccess(response) {
+      return response.json();
+    }, 
+    function onFailure(err) {
       console.error('Could not request my status');
-      return;
     }
-
+  ).then(function(data) {
     appState.mySlot.status = data;
 
     renderApp();
@@ -44,12 +46,14 @@ function init() {
 }
 
 function getMySlots() {
-  jsonRequest('GET', 'user/'+ config.id +'/slots', function(err, data) {
-    if (err) {
+  fetch('user/'+ config.id +'/slots').then(
+    function onSuccess(response) {
+      return response.json();
+    }, 
+    function onFailure(err) {
       console.error('Could not request my slots');
-      return;
     }
-
+  ).then(function(data) {
     appState.slots = data.value.map(function(id){
       if (id === null) {
         return null;
@@ -61,60 +65,35 @@ function getMySlots() {
       };
     });
 
-    var reqTotal = 0;
-    var reqComplete = 0;
-
-    appState.slots.forEach(function(slot) {
+    var fetchPromises = appState.slots.map(function(slot) {
       if (slot === null) {
-        return;
+        return null;
       }
 
-      reqTotal += 1;
+      return fetch('user/'+ slot.id +'/status');
+    })
 
-      jsonRequest('GET', 'user/'+ slot.id +'/status', function(err, data) {
-        if (err) {
-          console.error('Could not request status of' + slot.id);
+    Promise.all(fetchPromises).then(function(responses) {
+      var jsonPromises = responses.map(function (response) {
+        if (response === null) {
+          return null;
+        }
+
+        return response.json()
+      });
+
+      return Promise.all(jsonPromises);    
+    }).then(function(dataSet) {
+      dataSet.forEach(function(data, idx) {
+        if (data === null) {
           return;
         }
-        slot.status = data;
         
-        reqComplete += 1;
-        if (reqComplete === reqTotal) {
-          renderApp();
-        }
-      });
+        appState.slots[idx].status = data;
+      })
+      renderApp();
     });
   });
-}
-
-function jsonRequest(method, path, data, callback) {
-  if (typeof data === 'function') {
-    callback = data;
-  }
-
-  var headerConfig = {}
-
-  if (method === 'PUT') {
-    headerConfig['Content-Type'] = 'application/json';
-  }
-
-  var fetchConfig = {
-    method: method,
-    headers: new Headers(headerConfig), 
-    body: JSON.stringify(data)
-  };
-
-  window.fetch(path, fetchConfig).then(
-      function onSuccess(response){
-        response.json().then((json) => {
-          callback(null, json);
-        });
-      },
-      function onError(err){
-        console.error("Error fetching" + path, err);
-        callback(err);
-      }
-    );
 }
 
 function renderApp() {
@@ -146,15 +125,25 @@ function toggleMyStatus() {
   var data = {
     value: appState.mySlot.status.value === '0' ? '1' : '0'
   };
-  
-  jsonRequest('PUT', 'user/'+ config.id +'/status', data, function(err, data) {
-    if (err) {
+
+  var fetchConfig = {
+    method: 'PUT',
+    headers: new Headers({
+      'Content-Type': 'application/json'
+    }), 
+    body: JSON.stringify(data)
+  };
+
+  fetch('user/'+ config.id +'/status', fetchConfig).then(
+    function onSuccess(response) {
+      return response.json();
+    }, 
+    function onFailure(err) {
       console.error('Could not update my status');
-      return;
     }
-    
+  ).then(function(data) {
     appState.mySlot.status.value = data.value;
-    
+
     renderApp();
   });
 }
@@ -165,9 +154,10 @@ function sendMessage(idx) {
 
 function Buzz(m){
   var audio = document.getElementById('buzz');
+  
   audio.load();
   audio.play();
   setTimeout(function() {
-  audio.pause();
-}, m);
+    audio.pause();
+  }, m);
 }
