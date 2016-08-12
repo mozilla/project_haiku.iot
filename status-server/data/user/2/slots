@@ -1,11 +1,10 @@
 {
   "value":[
-    "/user/2",
-    "",
-    "",
-    "",
-    "/user/1",
-    "",
-    "/user/3",
+    null,
+    null,
+    null,
+    "1",
+    null,
+    "3"
   ]
 }
