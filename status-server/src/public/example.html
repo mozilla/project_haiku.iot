@@ -10,7 +10,7 @@
   <section class="container" id="visualization">
     <div id="band">
       <audio id="buzz" src="sounds/DrainMagic.ogg"></audio>
-      <div id="myled" class="myled" onclick="toggleMyStatus();"></div>
+      <div id="myled" class="led isSelf" onclick="toggleMyStatus();"></div>
       <div id="led0" class="led" onclick="sendMessage(0);"></div>
       <div id="led1" class="led" onclick="sendMessage(1);"></div>
       <div id="led2" class="led" onclick="sendMessage(2);"></div>
@@ -21,9 +21,15 @@
   </section>
 
 <script src="./js/config.js"></script>
+<script src="./js/util.js"></script>
 <script src="./js/color.js"></script>
+<script src="./js/easing.js"></script>
+<script src="./js/animation.js"></script>
+<script src="./js/slots-animation-manager.js"></script>
 <script src="./js/client.js"></script>
+
 <script type="text/javascript">
+ "use strict";
   init();
 </script>
 </body></html>
