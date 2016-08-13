@@ -19,4 +19,7 @@
         config[ nameValue[0] ] += location.hash;
     }
   }
+  if (!config.id) {
+    config.id = 0;
+  }
 })(window);
