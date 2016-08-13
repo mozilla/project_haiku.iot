@@ -26,78 +26,106 @@ an example of the slots array
 ]
 */
 
-function init() {
-  fetch('user/'+ config.id +'/status').then(
-    function onSuccess(response) {
-      return response.json();
-    }, 
-    function onFailure(err) {
-      console.error('Could not request my status');
-    }
-  ).then(function(data) {
-    appState.mySlot.status = data;
-
-    renderApp();
+function jsonRequest(url, config) {
+  // thin wrapper around fetch, to ensure errors go down the resolved path
+  var promise = new Promise((resolve, reject) => {
+    var fetched = window.fetch(url, config);
+    fetched.catch(function(err) {
+        // network or permissions error?
+        console.warn('jsonRequest errback, request for %s produced error', url, err);
+        resolve(null);
+    });
+    fetched.then(function(response) {
+      return response.json().then(function(data) {
+        resolve(data);
+      });
+    });
   });
-
-  getMySlots();
-
-  var intervalID = setInterval(getMySlots, 2000);
+  return promise;
 }
 
-function getMySlots() {
-  fetch('user/'+ config.id +'/slots').then(
-    function onSuccess(response) {
-      return response.json();
-    }, 
-    function onFailure(err) {
-      console.error('Could not request my slots');
+function init() {
+  initRendering();
+  initStatuses().then(function() {
+    setInterval(fetchAndRenderSlots, 2000);
+  });
+}
+
+function initStatuses() {
+  var statusPromise = jsonRequest('user/'+ config.id +'/status');
+  var slotsPromise = jsonRequest('user/'+ config.id +'/slots');
+  var initDataPromise = Promise.all([
+    statusPromise, slotsPromise
+  ]);
+
+  initDataPromise.then(function (results) {
+    var statusData = results[0];
+    var slotsData = results[1];
+    if (statusData) {
+      appState.mySlot.status = statusData;
+    } else {
+      // got no data, now what?
     }
-  ).then(function(data) {
-    appState.slots = data.value.map(function(id){
-      if (id === null) {
-        return null;
-      }
-      
-      return {
-        id: id,
-        status: null
-      };
-    });
-
-    var fetchPromises = appState.slots.map(function(slot) {
-      if (slot === null) {
-        return null;
-      }
-
-      return fetch('user/'+ slot.id +'/status');
-    })
-
-    Promise.all(fetchPromises).then(function(responses) {
-      var jsonPromises = responses.map(function (response) {
-        if (response === null) {
+    if (slotsData) {
+      appState.slots = slotsData.value.map(function(id){
+        if (id === null) {
           return null;
         }
-
-        return response.json()
+        return {
+          id: id,
+          status: null
+        };
       });
-
-      return Promise.all(jsonPromises);    
-    }).then(function(dataSet) {
-      dataSet.forEach(function(data, idx) {
-        if (data === null) {
-          return;
-        }
-        
-        appState.slots[idx].status = data;
-      })
-      renderApp();
-    });
+    }
+  }).then(function() {
+    return fetchAndRenderSlots();
   });
+
+  initDataPromise.catch(function (errors) {
+    console.warn('Encountered errors in init: ', errors);
+  });
+  return initDataPromise;
+}
+
+function initRendering() {
+  var titleNode = document.querySelector('h1');
+  if (titleNode) {
+    titleNode.innerHTML = 'status client: ' + config.id;
+  }
+  // temporarily map the user id to the led node just by aligning the indices.
+  // We'll want a proper slots=>users mapping eventually
+  Array.prototype.forEach.call(document.querySelectorAll('.led'), (node, idx) => {
+    var userId = node.id.replace(/^led([0-9])+/, '$1');
+    node.dataset.user = userId;
+  });
+}
+
+function fetchAndRenderSlots() {
+  var fetchPromises = appState.slots.map(function(slot) {
+    if (slot && ('id' in slot)) {
+      return jsonRequest('/user/'+ slot.id +'/status');
+    } else {
+      return Promise.resolve(null);
+    }
+  });
+  var fetched = Promise.all(fetchPromises);
+  fetched.then(function(dataSet) {
+    dataSet.forEach(function(data, idx) {
+      if (data === null) {
+        return;
+      }
+
+      appState.slots[idx].status = data;
+    });
+  }).then(function() {
+    renderApp();
+  });
+  fetched.catch(function(errors) {
+    console.warn('fetchMySlots errback: ', errors);
+  })
 }
 
 function renderApp() {
-  console.log('renderingApp')
   //render my status
   if (appState.mySlot.status.value === '1') {
     document.getElementById("myled").style.backgroundColor = 'green';
@@ -107,7 +135,7 @@ function renderApp() {
   }
   //render slots status
   appState.slots.forEach(function(slot, idx) {
-    if (slot === null) {
+    if (!(slot && slot.status)) {
       document.getElementById("led"+idx).style.backgroundColor = 'grey';
     }
     else {
@@ -130,21 +158,16 @@ function toggleMyStatus() {
     method: 'PUT',
     headers: new Headers({
       'Content-Type': 'application/json'
-    }), 
+    }),
     body: JSON.stringify(data)
   };
 
-  fetch('user/'+ config.id +'/status', fetchConfig).then(
-    function onSuccess(response) {
-      return response.json();
-    }, 
-    function onFailure(err) {
-      console.error('Could not update my status');
-    }
-  ).then(function(data) {
+  jsonRequest('user/'+ config.id +'/status', fetchConfig).then(function(data) {
     appState.mySlot.status.value = data.value;
 
     renderApp();
+  }, function(error) {
+    console.error('Could not update my status:', error);
   });
 }
 
@@ -154,7 +177,7 @@ function sendMessage(idx) {
 
 function Buzz(m){
   var audio = document.getElementById('buzz');
-  
+
   audio.load();
   audio.play();
   setTimeout(function() {
