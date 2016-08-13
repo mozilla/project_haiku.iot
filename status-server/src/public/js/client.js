@@ -4,7 +4,8 @@ var pollIntervalID;
 var appState = {
   mySlot: {
     id: config.id,
-    status: {}
+    status: {},
+    message: null
   },
   slots: []
 };
@@ -137,9 +138,19 @@ function fetchAndRenderSlots() {
       return Promise.resolve(null);
     }
   });
+  var messagesFetched = jsonRequest('/user/' + config.id + '/message');
+  fetchPromises.push(messagesFetched);
+
   var fetched = Promise.all(fetchPromises);
   fetched.then(function(dataSet) {
-    dataSet.forEach((data, idx) => updateSlot(data, idx, appState.slots));
+    dataSet.forEach((data, idx, collection) => {
+      if (idx < collection.length - 1) {
+        updateSlot(data, idx, appState.slots)
+      } else {
+        // my messages
+        updateMessage(data);
+      }
+    });
   }).then(function() {
     renderApp();
   });
@@ -147,21 +158,39 @@ function fetchAndRenderSlots() {
     console.warn('fetchMySlots errback: ', errors);
   })
 }
+function updateMessage(messageData) {
+  if (!messageData) {
+    return;
+  }
+  var lastMessage = appState.mySlot.message;
+  var didChange;
+  var recentThreshold = 1000 * 60; // 1 minute, we ignore stale messages
+  var timeSent = (new Date(messageData['last-modified'])).getTime();
+  if (!lastMessage ||
+      (lastMessage.sender !== messageData.sender) ||
+      (lastMessage['last-modified'] !== messageData['last-modified']))
+  {
+    if (Date.now() - timeSent <= recentThreshold) {
+      appState.mySlot.message = messageData;
+      SlotsAnimationManager.playMessage(messageData.value);
+    }
+  }
+}
 
 function updateSlot(newStatus, idx, collection) {
   var slot = collection[idx];
-  if (!slot.id) {
-    // empty slot.
-    if (!slot.status) {
-      slot.status = {
-        value: 0,
-        empty: true,
-        didChange: true
-      };
-    }
-    return;
+  // empty slot.
+  if (!slot.status) {
+    slot.status = {
+      value: 0,
+      didChange: true
+    };
   }
+  slot.empty = !!slot.id;
   var oldStatus = slot.status;
+  if (!newStatus) {
+    newStatus = oldStatus;
+  }
   // keep an existing didChange value - we only reset when we render
   var didChange = oldStatus ? oldStatus.didChange : true;
   var lastModified = newStatus['last-modified'];
@@ -175,11 +204,9 @@ function updateSlot(newStatus, idx, collection) {
     didChange = true;
   }
   if (didChange) {
-    slot.status = {
-      value: newStatus.value,
-      lastModified: newStatus['last-modified'],
-      didChange: didChange
-    }
+    slot.status.value = newStatus.value;
+    slot.status.lastModified = newStatus['last-modified'];
+    slot.status.didChange = didChange;
   }
 }
 
@@ -188,9 +215,6 @@ function renderApp() {
   var allSlots = [appState.mySlot].concat(appState.slots);
   allSlots.forEach(function(slot, idx) {
     var didChange;
-    if (slot && slot.status) {
-
-    }
     if (!slot) {
       // empty slot
     } else if (slot.status && slot.status.didChange) {
@@ -198,6 +222,11 @@ function renderApp() {
       SlotsAnimationManager.changeSlotStatus(idx, slot.status.value === '1' ? 1 : 0);
       // reset dirty flag
       slot.status.didChange = false;
+    }
+    if (slot.messageSent) {
+      var viewModelIndex = idx;
+      SlotsAnimationManager.messageSentToSlot(viewModelIndex, slot.messageSent);
+      delete slot.messageSent;
     }
   });
 }
@@ -236,7 +265,35 @@ function toggleMyStatus() {
 }
 
 function sendMessage(idx) {
-  alert('NOT IMPLEMENTED: send message to '+idx)
+  var slot = appState.slots[idx];
+  var myActive = appState.mySlot.status.value === '1';
+  if (!(myActive && slot && slot.status && slot.status.value === '1')) {
+    return;
+  }
+  if (!slot.id) {
+    console.warn('sendMessage: no id for user at slot: ', slot);
+    return;
+  }
+  var message = {
+    value: ""+MessageType.rainbow,
+    sender: ""+config.id
+  };
+  // update the local model
+  slot.messageSent = MessageType.rainbow; // the rainbow message
+
+  var fetchConfig = {
+    method: 'PUT',
+    headers: new Headers({
+      'Content-Type': 'application/json'
+    }),
+    body: JSON.stringify(message)
+  };
+  var messageUpdated = jsonRequest('user/'+ slot.id +'/message', fetchConfig);
+  messageUpdated.catch(function(error) {
+    console.error('Could not update message:', error);
+    // TODO: trigger some error animation?
+  });
+  renderApp();
 }
 
 function Buzz(m){
@@ -248,3 +305,7 @@ function Buzz(m){
     audio.pause();
   }, m);
 }
+
+var MessageType = {
+  'rainbow': 1
+};

@@ -100,11 +100,11 @@ function pixelGroupKeyFrameAnimation(delta, animateState, pixels) {
     if (--animateState.iterationCount) {
       // reset to start over at 0%
       elapsedTime = animateState.elapsedTime = 0;
-      console.log('over duration, iterationCount now: ', animateState.iterationCount);
+      // console.log('over duration, iterationCount now: ', animateState.iterationCount);
     } else {
       animateState.stopped = true;
       // FIXME: do we never get to 100% this way?
-      console.log('over duration, stopping at: ', animateState.iterationCount);
+      // console.log('over duration, stopping at: ', animateState.iterationCount);
       return;
     }
   }
@@ -263,6 +263,22 @@ function createAnimation(animName, config) {
       animateState.iterationCount = Infinity;
       break;
     case 'rainbow':
+      animateState.updateFn = keyFrameAnimation;
+      animateState.name = animName;
+      animateState.keyFrames = {
+        '0%': Color.create(238, 130, 238),
+        '14.3%': Color.create(255, 0, 0),
+        '28.6%': Color.create(255, 165, 0),
+        '42.9%': Color.create(255, 255, 0),
+        '57.1%': Color.create(0, 128, 0),
+        '71.4%': Color.create(0, 0, 255),
+        '85.7%': Color.create(75, 0, 130),
+        '100%': Color.create(238, 130, 238)
+      };
+      animateState.currKeyFrame = '0%';
+      animateState.duration = 1100;
+      break;
+    case 'rainbowAll':
       animateState.updateFn = pixelGroupKeyFrameAnimation;
       animateState.name = animName;
       animateState.keyFrames = {

@@ -89,6 +89,21 @@ SlotsAnimationManager.changeState = function(stateId) {
   }
   this.stateId = stateId;
 };
+
+SlotsAnimationManager.messageSentToSlot = function(slotIndex, msgValue) {
+  var slot = this.slots[slotIndex];
+  var animation;
+  switch (msgValue) {
+    // TODO: implement other message/animation types?
+    default:
+      slot.animationStack.push(Animation.createAnimation('rainbow', {
+        iterationCount: 2,
+        duration: 600
+      }));
+      break;
+  }
+};
+
 SlotsAnimationManager.changeSlotStatus = function(slotIndex, statusValue) {
   var slot = this.slots[slotIndex];
   if (statusValue == slot.status) {
@@ -118,8 +133,8 @@ SlotsAnimationManager.playMessage = function(msgValue) {
   switch (msgValue) {
     // TODO: implement other message/animation types?
     default:
-      console.log('adding rainbow to animationStack');
-      this.animationStack.push(Animation.createAnimation('rainbow', {
+      console.log('adding rainbowAll to animationStack');
+      this.animationStack.push(Animation.createAnimation('rainbowAll', {
         iterationCount: 2,
         duration: 600
       }));
