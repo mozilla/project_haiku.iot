@@ -32,10 +32,6 @@ h1 {
   margin: 0 1px;
 }
 
-.myled {
-  margin: 0 9px;
-  border: 3px solid #fff;
-}
 .led {
   width: 20px;
   height: 20px;
@@ -44,6 +40,10 @@ h1 {
   border-radius: 3px;
   /*background-color: #000;*/
   margin: 0 1px;
+}
+.led.isSelf {
+  margin: 0 9px;
+  border: 3px solid #fff;
 }
 
 #led0 {background-color: #ff00ff;}

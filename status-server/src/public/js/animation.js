@@ -197,8 +197,7 @@ function createAnimation(animName, config) {
       animateState.updateFn = keyFrameAnimation;
       animateState.name = animName;
       animateState.keyFrames = {
-        '0%': Color.create(0,153,32),
-        '50%': Color.create(0,0,0),
+        '00%': Color.create(0,0,0),
         '65%': Color.create(0,0,80),
         '100%': Color.create(0,0,0)
       };
@@ -303,7 +302,6 @@ function createAnimation(animName, config) {
       animateState[key] = config[key];
     }
   }
-  console.log('createAnimation: ', animateState);
   return animateState;
 }
 Animation.createAnimation = createAnimation;

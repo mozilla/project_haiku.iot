@@ -115,9 +115,8 @@ function paintPixels() {
 }
 
 
-var gSlots = new Array(7);
-// pass in the slots array to initialize the animation manager
-SlotsAnimationManager.init(gSlots);
+// the animation manager populates the sized array you pass
+var gSlots = SlotsAnimationManager.initSlots(new Array(7));
 // give it a render function to be called each tick
 SlotsAnimationManager.render = paintPixels;
 

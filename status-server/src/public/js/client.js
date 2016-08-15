@@ -1,5 +1,6 @@
 /* global config */
 
+var pollIntervalID;
 var appState = {
   mySlot: {
     id: config.id,
@@ -7,7 +8,8 @@ var appState = {
   },
   slots: []
 };
-
+var gPixelNodes;
+var gPixels;
 /*
 an example of the slots array
 [
@@ -46,9 +48,19 @@ function jsonRequest(url, config) {
 
 function init() {
   initRendering();
-  initStatuses().then(function() {
-    setInterval(fetchAndRenderSlots, 2000);
-  });
+  initStatuses().then(startPolling);
+}
+
+function startPolling() {
+  if (pollIntervalID) {
+    return;
+  }
+  pollIntervalID = setInterval(fetchAndRenderSlots, 2000);
+}
+
+function stopPolling() {
+  clearInterval(pollIntervalID);
+  pollIntervalID = null;
 }
 
 function initStatuses() {
@@ -62,15 +74,13 @@ function initStatuses() {
     var statusData = results[0];
     var slotsData = results[1];
     if (statusData) {
+      statusData.didChange = true;
       appState.mySlot.status = statusData;
     } else {
       // got no data, now what?
     }
     if (slotsData) {
       appState.slots = slotsData.value.map(function(id){
-        if (id === null) {
-          return null;
-        }
         return {
           id: id,
           status: null
@@ -87,22 +97,41 @@ function initStatuses() {
   return initDataPromise;
 }
 
+function setPixelNodeColor(node, color) {
+  var colorStr;
+  if ('h' in color) {
+    // assume HSV
+    var hsvColor = color;
+    color = Color.HSVtoRGB(hsvColor);
+  }
+  var colorStr = 'rgb('+color.r.toFixed(0)+','+color.g.toFixed(0)+','+color.b.toFixed(0)+')';
+  node.style.backgroundColor = colorStr;
+}
+
+function paintPixels() {
+  for(var i=0; i<gPixels.length; i++) {
+    setPixelNodeColor(gPixelNodes[i], gPixels[i].color);
+  }
+}
+
 function initRendering() {
   var titleNode = document.querySelector('h1');
   if (titleNode) {
     titleNode.innerHTML = 'status client: ' + config.id;
   }
-  // temporarily map the user id to the led node just by aligning the indices.
-  // We'll want a proper slots=>users mapping eventually
-  Array.prototype.forEach.call(document.querySelectorAll('.led'), (node, idx) => {
-    var userId = node.id.replace(/^led([0-9])+/, '$1');
-    node.dataset.user = userId;
-  });
+  gPixelNodes = document.querySelectorAll('#band > .led');
+
+  // SlotsAnimationManager prepares a view-model for each slot (including self) we need to render
+  gPixels = SlotsAnimationManager.initSlots(new Array(gPixelNodes.length));
+  // give it a render function to be called each animation frame
+  SlotsAnimationManager.render = paintPixels;
+  // start calling render ~60fps
+  SlotsAnimationManager.start();
 }
 
 function fetchAndRenderSlots() {
   var fetchPromises = appState.slots.map(function(slot) {
-    if (slot && ('id' in slot)) {
+    if (slot && ('id' in slot) && slot.id !== null) {
       return jsonRequest('/user/'+ slot.id +'/status');
     } else {
       return Promise.resolve(null);
@@ -110,13 +139,7 @@ function fetchAndRenderSlots() {
   });
   var fetched = Promise.all(fetchPromises);
   fetched.then(function(dataSet) {
-    dataSet.forEach(function(data, idx) {
-      if (data === null) {
-        return;
-      }
-
-      appState.slots[idx].status = data;
-    });
+    dataSet.forEach((data, idx) => updateSlot(data, idx, appState.slots));
   }).then(function() {
     renderApp();
   });
@@ -125,50 +148,91 @@ function fetchAndRenderSlots() {
   })
 }
 
+function updateSlot(newStatus, idx, collection) {
+  var slot = collection[idx];
+  if (!slot.id) {
+    // empty slot.
+    if (!slot.status) {
+      slot.status = {
+        value: 0,
+        empty: true,
+        didChange: true
+      };
+    }
+    return;
+  }
+  var oldStatus = slot.status;
+  // keep an existing didChange value - we only reset when we render
+  var didChange = oldStatus ? oldStatus.didChange : true;
+  var lastModified = newStatus['last-modified'];
+  if (!didChange) {
+    // NOTE: we could consider a more recent last-modified as a change needing rendering
+    if (newStatus.value !== oldStatus.value) {
+      console.log('updateStatus with changed newStatus', newStatus);
+      didChange = true;
+    }
+  } else {
+    didChange = true;
+  }
+  if (didChange) {
+    slot.status = {
+      value: newStatus.value,
+      lastModified: newStatus['last-modified'],
+      didChange: didChange
+    }
+  }
+}
+
 function renderApp() {
-  //render my status
-  if (appState.mySlot.status.value === '1') {
-    document.getElementById("myled").style.backgroundColor = 'green';
-  }
-  else {
-    document.getElementById("myled").style.backgroundColor = 'red';
-  }
-  //render slots status
-  appState.slots.forEach(function(slot, idx) {
-    if (!(slot && slot.status)) {
-      document.getElementById("led"+idx).style.backgroundColor = 'grey';
+  // update the view model for the next tick
+  var allSlots = [appState.mySlot].concat(appState.slots);
+  allSlots.forEach(function(slot, idx) {
+    var didChange;
+    if (slot && slot.status) {
+
     }
-    else {
-      if (slot.status.value === '1') {
-        document.getElementById("led"+idx).style.backgroundColor = 'green';
-      }
-      else {
-        document.getElementById("led"+idx).style.backgroundColor = 'red';
-      }
+    if (!slot) {
+      // empty slot
+    } else if (slot.status && slot.status.didChange) {
+      console.log('renderApp: change slot status: ', idx, slot);
+      SlotsAnimationManager.changeSlotStatus(idx, slot.status.value === '1' ? 1 : 0);
+      // reset dirty flag
+      slot.status.didChange = false;
     }
-  })
+  });
 }
 
 function toggleMyStatus() {
-  var data = {
-    value: appState.mySlot.status.value === '0' ? '1' : '0'
+  var oldStatus = appState.mySlot.status || { value: '0' };
+  var newStatus = {
+    value: oldStatus.value === '1' ? '0' : '1'
   };
+  // optimistically update locally, we'll roll it back if the request fails
+  updateSlot(newStatus, 0, [appState.mySlot]);
 
   var fetchConfig = {
     method: 'PUT',
     headers: new Headers({
       'Content-Type': 'application/json'
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(newStatus)
   };
 
-  jsonRequest('user/'+ config.id +'/status', fetchConfig).then(function(data) {
-    appState.mySlot.status.value = data.value;
-
-    renderApp();
-  }, function(error) {
+  // TODO: could fire and forget here as we're already getting regular updates from the server
+  var statusUpdated = jsonRequest('user/'+ config.id +'/status', fetchConfig);
+  statusUpdated.catch(function(error) {
     console.error('Could not update my status:', error);
+    updateSlot(oldStatus, 0, [appState.mySlot]);
+    renderApp();
   });
+
+  renderApp();
+
+  if (newStatus.value === '1') {
+    startPolling();
+  } else {
+    stopPolling();
+  }
 }
 
 function sendMessage(idx) {

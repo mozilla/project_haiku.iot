@@ -22,7 +22,7 @@ var SlotsAnimationManager = exports.SlotsAnimationManager = {
   animateRAFId: null
 };
 
-SlotsAnimationManager.init = function(slots) {
+SlotsAnimationManager.initSlots = function(slots) {
   this.slots = slots;
   for(var i=0; i<slots.length; i++) {
     slots[i] = Object.create(Slot);
@@ -32,13 +32,11 @@ SlotsAnimationManager.init = function(slots) {
       Animation.createAnimation('connecting', {})
     ];
   }
+  return this.slots;
 };
 SlotsAnimationManager.start = function(stateId) {
   this.changeState(stateId || SlotsAnimationManager.state.INITIALIZING);
   this.animateRAFId = window.requestAnimationFrame(this.onAnimationFrame);
-  setTimeout(() => {
-    this.changeState(SlotsAnimationManager.state.ACTIVE);
-  }, 2000);
 };
 
 SlotsAnimationManager.stop = function() {
@@ -66,22 +64,26 @@ SlotsAnimationManager.changeState = function(stateId) {
   this.nextStateId = stateId;
   switch (stateId) {
     case SlotsAnimationManager.state.INITIALIZING: {
-      let animation = Animation.createAnimation('initializing', {});
-      console.log('pushing initializing animation onto stack')
+      let animation = Animation.createAnimation('initializing', {
+        iterationCount: Infinity
+      });
       this.animationStack.splice(0, this.animationStack.length, animation);
       break;
     }
     case SlotsAnimationManager.state.ACTIVE: {
       this.slots[0].status = 1;
-      let animation = Animation.createAnimation('ledStatus', {});
-      console.log('pushing ledStatus animation onto stack')
+      let animation = Animation.createAnimation('ledStatus', {
+        iterationCount: Infinity
+      });
       this.animationStack.splice(0, this.animationStack.length, animation);
       break;
     }
     case SlotsAnimationManager.state.INACTIVE: {
       this.slots[0].status = 0;
-      this.animationStack.splice(0, this.animationStack.length,
-                                 Animation.createAnimation('allOff', {}));
+      let animation = Animation.createAnimation('allOff', {
+        iterationCount: Infinity
+      });
+      this.animationStack.splice(0, this.animationStack.length, animation);
       break;
     }
   }
@@ -99,16 +101,13 @@ SlotsAnimationManager.changeSlotStatus = function(slotIndex, statusValue) {
   slot.status = statusValue;
   if (slotIndex === 0) {
     this.changeState(statusValue ? SlotsAnimationManager.state.ACTIVE : SlotsAnimationManager.state.INACTIVE);
-    return;
   }
-  if (this.stateId !== SlotsAnimationManager.state.ACTIVE) {
-    return;
-  }
+
   var animation;
   if (statusValue) {
-    animation = Animation.createAnimation('available', {});
+    animation = Animation.createAnimation('available', { iterationCount: Infinity });
   } else {
-    animation = Animation.createAnimation('notAvailable', {});
+    animation = Animation.createAnimation('notAvailable', { iterationCount: Infinity });
   }
   // replace the whole animation stack with this new animation
   slot.animationStack.splice(0, slot.animationStack.length, animation);
