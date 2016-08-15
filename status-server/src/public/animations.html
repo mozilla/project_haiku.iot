@@ -32,7 +32,7 @@
     <p><label><input type="checkbox" onclick="testChangeSlotStatus(this, 3)">3: set status</label></p>
     <p><label><input type="checkbox" onclick="testChangeSlotStatus(this, 4)">4: set status</label></p>
     <p><label><input type="checkbox" onclick="testChangeSlotStatus(this, 5)">5: set status</label></p>
-    <button onclick="SlotsAnimationManager.playMessage('rainbow')">send rainbow</button>
+    <button onclick="SlotsAnimationManager.playMessage('rainbowAll')">send rainbow</button>
 
   </section>
 
@@ -69,7 +69,7 @@ function playBreatheAll() {
 }
 
 function playRainbow() {
-  var animation = Animation.createAnimation('rainbow', {});
+  var animation = Animation.createAnimation('rainbowAll', {});
   SlotsAnimationManager.animationStack.push(animation);
 }
 
