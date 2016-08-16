@@ -3,18 +3,20 @@ var bodyParser = require('body-parser');
 var express = require('express');
 var fs = require('fs');
 var path = require('path');
+var cors = require('cors');
 
 var app = express();
 var dataDir = path.join(__dirname, '../data');
 var publicDir = path.join(__dirname, 'public');
 var config = {
-  port: 3000
+  port: process.env.PORT || 3000
 };
 
 // FIXME: disabling this temporarily as it is causing all non-GET requests
 // to return a 405 Method not allowed error
 // app.use(serveIndex(publicDir, {'icons': true}));
 
+app.use(cors());
 app.use(bodyParser.urlencoded({
   extended: true
 }));

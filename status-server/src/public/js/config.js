@@ -1,6 +1,8 @@
 (function(global){
   // export a config global
-  var config = global.config = {};
+  var config = global.config = {
+    apiOrigin: 'http://localhost:3000'
+  };
 
   // pull config from querystring
   var expectedKeys = { id: true, autostart: true };

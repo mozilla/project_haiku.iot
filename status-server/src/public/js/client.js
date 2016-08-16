@@ -29,10 +29,12 @@ an example of the slots array
 ]
 */
 
-function jsonRequest(url, config) {
+function jsonRequest(url, requestConfig) {
   // thin wrapper around fetch, to ensure errors go down the resolved path
+  url = config.apiOrigin + '/' + url;
+
   var promise = new Promise((resolve, reject) => {
-    var fetched = window.fetch(url, config);
+    var fetched = window.fetch(url, requestConfig);
     fetched.catch(function(err) {
         // network or permissions error?
         console.warn('jsonRequest errback, request for %s produced error', url, err);
@@ -133,12 +135,12 @@ function initRendering() {
 function fetchAndRenderSlots() {
   var fetchPromises = appState.slots.map(function(slot) {
     if (slot && ('id' in slot) && slot.id !== null) {
-      return jsonRequest('/user/'+ slot.id +'/status');
+      return jsonRequest('user/'+ slot.id +'/status');
     } else {
       return Promise.resolve(null);
     }
   });
-  var messagesFetched = jsonRequest('/user/' + config.id + '/message');
+  var messagesFetched = jsonRequest('user/' + config.id + '/message');
   fetchPromises.push(messagesFetched);
 
   var fetched = Promise.all(fetchPromises);
