@@ -7,6 +7,7 @@ function objectValues(obj) {
 function startPolling() {
   stopPolling();
   intervalID = setInterval(requestStatus, 10000);
+  pollingStatusText.innerText = "Start";
 }
 
 function stopPolling() {
@@ -14,20 +15,14 @@ function stopPolling() {
     clearInterval(intervalID);
   }
   intervalID = null;
+  pollingStatusText.innerText = "Stop";
 }
 
-function togglePolling(btn) {
+function resetPolling() {
   if (intervalID) {
     stopPolling();
-    if(btn) {
-      btn.value = "Start";
-    }
-  } else {
-    startPolling();
-    if (btn) {
-      btn.value = "Stop";
-    }
   }
+  startPolling();
 }
 
 function postNewStatus(url, newStatusValue) {
@@ -45,7 +40,8 @@ function postNewStatus(url, newStatusValue) {
       messageDiv.innerText = newStatusValue;
     }
   }).catch(function(ex) {
-    console.log('Error while invoking post url', ex);
+    console.log('Error while invoking put using url');
+    console.log(ex);
     console.log(url);
   });
 }
@@ -102,6 +98,7 @@ function httpGetRequest(url, idx, cb) {
       cb(null);
     }
   }).catch(function(ex) {
-    console.log('Get request failed', ex)
+    console.log('Get request failed');
+    console.log(ex);
   });
 }

@@ -65,12 +65,14 @@ var app = {
         ble.disconnect(app.connectedPeripheral.id, app.onDisconnect);
     },
     onConnect: function(peripheral) {
+        console.log("BLEBuzzy peripheral");
+        console.log(JSON.stringify(peripheral, null, 2));
         app.connectedPeripheral = peripheral;
         connectionScreen.hidden = true;
         statusScreen.hidden = false;
         app.setStatus("Connected.");
         app.syncUI();
-        togglePolling();
+        resetPolling();
 
         ble.startNotification(peripheral.id, BLE_BUZZ_PIXEL_SERVICE, READ_DEVICE_STATUS,
         function(buffer) {
@@ -81,6 +83,11 @@ var app = {
           // Update self status in cloud
           var status = data[0] ? 1 : 0;
           postNewStatus(baseURL + selfURL, status);
+        },
+        function(error) {
+            console.log('Buzzy-pixel Error reading characteristic');
+            console.log(error);
+            app.setStatus("Error reading characteristic " + error);
         });
 
     },
@@ -100,6 +107,11 @@ var app = {
           // Update self status in cloud
           var status = data[0] ? 1 : 0;
           postNewStatus(baseURL + selfURL, status);
+        },
+        function(error) {
+            console.log('Buzzy-pixel error reading characteristic on synch');
+            console.log(error);
+            app.setStatus("Error reading characteristic " + error);
         });
     },
     // Handle Status update from App Update button click
@@ -118,6 +130,8 @@ var app = {
                 }
             },
             function(error) {
+                console.log('Buzzy-pixel Error setting characteristi');
+                console.log(error);
                 app.setStatus("Error setting characteristic " + error);
             }
         );
@@ -127,6 +141,11 @@ var app = {
           for (var i in data) {
             console.log(data[i]);
           }
+        },
+        function(error) {
+            console.log('Buzzy-pixel error reading characteristic after set status');
+            console.log(error);
+            app.setStatus("Error reading characteristic " + error);
         });
     },
     timeoutId: 0,
