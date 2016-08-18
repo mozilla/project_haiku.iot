@@ -1,7 +1,7 @@
 // Slot assigned to wearable owner
 var selfLED = 4;
 // Address where status service is running
-var baseURL = 'http://192.168.1.12:3000';
+var baseURL = 'http://127.0.0.1:3000';
 // Slot URL of the owner
 var selfURL = '/user/4/status';
 // Number of slots on wearable
