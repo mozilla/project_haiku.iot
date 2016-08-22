@@ -1,14 +1,14 @@
-# Cordova Android app BLE-Buzzy-Pixel-BluetoothLE
+# Cordova Android app BluetoothLE Buzzy Pixel
 
 Cordova app communicating with NeoPixel using BLE
 
-## Steps to run BLE-Buzzy-Pixel-BluetoothLE Android app
+## Steps to run BluetoothLE Buzzy Pixel Android app
 
 Follow below commands to create cordova Android app. [Link with detail commands](https://cordova.apache.org/docs/en/latest/guide/cli/) 
 
 * sudo npm install -g cordova
 * install android studio which brings in android sdk http://developer.android.com/sdk/installing/index.html?pkg=studio
-* cd BLE-Buzzy-Pixel-BluetoothLE/
+* cd BLE-Buzzy-Pixel/
 * cordova platform add android
 * cordova plugin add cordova-plugin-bluetoothle@3.1.0 [Tested with 3.1.0]
 * cordova plugin add <path to local cordova-plugin-fetch directory [../cordove-plugin-fetch]>
