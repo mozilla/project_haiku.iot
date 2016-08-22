@@ -4,6 +4,9 @@ var PUSH_COLOR_STATUS = '0318ef80-54b5-11e6-beb8-9e71128cae77';
 var READ_DEVICE_STATUS = '0318f084-54b5-11e6-beb8-9e71128cae77';
 
 var app = {
+    foundDevices: [],
+    timeoutId: 0,
+
     initialize: function() {
         this.bind();
     },
@@ -19,115 +22,156 @@ var app = {
         refreshButton.ontouchstart = app.scan;
         disconnectButton.ontouchstart = app.disconnect;
         updateButton.ontouchstart = app.updateStatusOnDevice;
-        app.scan();
+
+        new Promise(function (resolve, reject) {
+            bluetoothle.initialize(resolve, { request: true, statusReceiver: false });
+        }).then(app.initializeSuccess, app.handleError);
+    },
+
+    initializeSuccess: function(result) {
+        if (result.status === "enabled") {
+            app.log("Bluetooth is enabled.");
+            app.log(result);
+            bluetoothle.hasPermission(function() {
+                bluetoothle.requestPermission(function() {
+                    app.scan();
+                    app.log("Bluetooth permission request sucess.");
+                }, function() {
+                    app.log("Bluetooth permission request error.");
+                });
+            });
+        }
+        else {
+            refreshButton.disabled = true;
+            app.log("Bluetooth is not enabled:", "status");
+            app.log(result, "status");
+        }
     },
 
     scan: function(e) {
         deviceList.innerHTML = ""; // clear the list
-        app.setStatus("Scanning for Bluetooth Devices...");
+        app.foundDevices = [];
+        bluetoothle.startScan(app.startScanSuccess, app.handleError, { services: [BLE_BUZZ_PIXEL_SERVICE] });
 
-        ble.startScan([BLE_BUZZ_PIXEL_SERVICE],
-            app.onDeviceDiscovered,
-            function() { app.setStatus("Listing Bluetooth Devices Failed"); }
-        );
-        // stop scan after 10 seconds
-        setTimeout(ble.stopScan, 10000, app.onScanComplete);
+         // stop scan after 10 seconds
+        setTimeout(function(){ app.stopScan(); }, 10000);   
     },
 
-    onDeviceDiscovered: function(device) {
+    startScanSuccess: function(result) {
         var listItem, rssi;
 
-        console.log(JSON.stringify(device));
-        listItem = document.createElement('li');
-        listItem.dataset.deviceId = device.id;
-        if (device.rssi) {
-            rssi = "RSSI: " + device.rssi + "<br/>";
-        } else {
-            rssi = "";
-        }
-        listItem.innerHTML = device.name + "<br/>" + rssi + device.id;
-        deviceList.appendChild(listItem);
+        app.log("startScanSuccess(" + result.status + ")");
+        if (result.status === "scanStarted") {
+            app.log("Scanning for devices ...", "status");
 
-        var deviceListLength = deviceList.getElementsByTagName('li').length;
-        app.setStatus("Found " + deviceListLength + 
-                      " device" + (deviceListLength === 1 ? "." : "s."));
+        } else if (result.status === "scanResult") {
+            if (!app.foundDevices.some(function (device) {
+                return device.address === result.address;
+
+            })) {
+                listItem = document.createElement('li');
+                listItem.dataset.deviceId = result.address;
+                if (result.rssi) {
+                    rssi = "RSSI: " + result.rssi + "<br/>";
+                } else {
+                    rssi = "";
+                }
+                listItem.innerHTML = result.name + "<br/>" + rssi + result.address;
+                deviceList.appendChild(listItem);
+                app.foundDevices.push(result);
+            }
+        }
     },
 
-    onScanComplete: function() {
-        var deviceListLength = deviceList.getElementsByTagName('li').length;
-        if (deviceListLength === 0) {
-            app.setStatus("No Bluetooth Peripherals Discovered.");
+    stopScan: function() {
+        bluetoothle.stopScan(app.onScanComplete, app.handleError);
+    },
+
+    onScanComplete: function(result) {
+        if (result.status === "scanStopped") {
+            var deviceListLength = deviceList.getElementsByTagName('li').length;
+            if (deviceListLength === 0) {
+                app.setStatus("No Bluetooth Peripherals Discovered.");
+            } else {
+                app.setStatus("Found " + deviceListLength + 
+                              " device" + (deviceListLength === 1 ? "." : "s."));
+            }
         }
     },
 
     connect: function (e) {
         app.setStatus("Connecting...");
         var deviceId = e.target.dataset.deviceId;
-        console.log("Requesting connection to " + deviceId);
-        ble.connect(deviceId, app.onConnect, app.onDisconnect);
+        app.log("Requesting connection to " + deviceId);
+        new Promise(function (resolve, reject) {
+            bluetoothle.connect(resolve, reject, { address: deviceId });
+        }).then(app.connectSuccess, app.handleError);
+
+    },
+
+    unexpectedDisconnect: function() {
+
     },
 
     disconnect: function(event) {
         app.setStatus("Disconnecting...");
-        ble.disconnect(app.connectedPeripheral.id,
-            function() {
+        bluetoothle.close(function() {
                 stopPolling();
                 connectionScreen.hidden = false;
                 statusScreen.hidden = true;
                 app.setStatus("Disconnected");
                 setTimeout(app.scan, 1000);
-            });
+            }, app.handleError, { "address": app.connectedPeripheral.address});
     },
 
-    onConnect: function(peripheral) {
-        console.log("BLEBuzzy peripheral");
-        console.log(JSON.stringify(peripheral, null, 2));
-        app.connectedPeripheral = peripheral;
-        connectionScreen.hidden = true;
-        statusScreen.hidden = false;
-        app.setStatus("Connected.");
-        app.syncUI();
-        resetPolling();
-
-        ble.startNotification(peripheral.id, BLE_BUZZ_PIXEL_SERVICE, READ_DEVICE_STATUS, app.onData,
-        function(error) {
-            console.log('Buzzy-pixel Error reading characteristic');
-            console.log(error);
-            app.setStatus("Error reading characteristic " + error);
-        });
-    },
-
-    onData: function(buffer) {
-        var data = new Uint8Array(buffer);
-        var homeSlot = 'status' + selfLED;
-        homeSlot.value = data[0];
-        readStatusText.innerText = data[0];
-        // Update self status in cloud
-        var status = data[0] ? 1 : 0;
-        postNewStatus(baseURL + selfURL, status);
-    },
-
-    onDisconnect: function(reason) {
-        if (!reason) {
-            reason = "Connection Lost";
+    connectSuccess: function(result) {
+        if (result.status === "connected") {
+            app.log(result);
+            app.connectedPeripheral = result;
+            connectionScreen.hidden = true;
+            statusScreen.hidden = false;
+            app.setStatus("Connected.");
+            new Promise(function (resolve, reject) {
+                bluetoothle.discover(resolve, reject,
+                    { address: app.connectedPeripheral.address });
+            }).then(function(result) {
+                app.log("Disovered services are:");
+                app.log(result);
+                resetPolling();
+                bluetoothle.subscribe(app.onData, app.handleError,
+                    { address: app.connectedPeripheral.address, service: BLE_BUZZ_PIXEL_SERVICE, characteristic: READ_DEVICE_STATUS});
+            }, app.handleError);
+        } else if (result.status === "disconnected") {
+            // device unexpectedly disconnects
+            app.onDisconnect();
         }
+    },
+
+    onData: function(result) {
+        app.log(result.status);
+        if ((result.status === "read")  || (result.status === "subscribedResult")) {
+            var arStatus = bluetoothle.encodedStringToBytes(result.value);
+            var homeSlot = 'status' + selfLED;
+            homeSlot.value = arStatus[0];
+            readStatusText.innerText = arStatus[0];
+            // Update self status in cloud
+            var status = arStatus[0] ? 1 : 0;
+            postNewStatus(baseURL + selfURL, status);
+       }
+    },
+
+    onDisconnect: function() {
         stopPolling();
         connectionScreen.hidden = false;
         statusScreen.hidden = true;
-        app.setStatus(JSON.stringify(reason));
-        console.log("BLE Buzzy Pixel unexpected disconnect");
-        console.log(JSON.stringify(reason));
+        app.setStatus("Connection Lost");
+        app.log("BLE Buzzy Pixel unexpected disconnect");
     },
 
-    syncUI: function() {
-        // read values from BLE device and update the phone UI and pass updated status to cloud
-        var id = app.connectedPeripheral.id;
-        ble.read(id, BLE_BUZZ_PIXEL_SERVICE, READ_DEVICE_STATUS, app.onData,
-        function(error) {
-            console.log('Buzzy-pixel error reading characteristic on synch');
-            console.log(error);
-            app.setStatus("Error reading characteristic on synch " + error);
-        });
+    readStatusFromBLE: function() {
+        // read values from BLE device
+        bluetoothle.read(app.onData, app.handleError,
+            { address: app.connectedPeripheral.address, service: BLE_BUZZ_PIXEL_SERVICE, characteristic: READ_DEVICE_STATUS });
     },
 
     // Handle Status update from App Update button click
@@ -140,40 +184,65 @@ var app = {
     },
 
     sendStatusToBLENano: function(arStatus) {
-        ble.write(app.connectedPeripheral.id, BLE_BUZZ_PIXEL_SERVICE, PUSH_COLOR_STATUS, arStatus.buffer,
-            function() {
-                for (var i in arStatus) {
-                  window['status' + i].value = arStatus[i];
-                }
-            },
-            function(error) {
-                console.log('Buzzy-pixel Error setting characteristi');
-                console.log(error);
-                app.setStatus("Error setting characteristic " + error);
-            }
-        );
-        setTimeout(ble.read(app.connectedPeripheral.id, BLE_BUZZ_PIXEL_SERVICE, PUSH_COLOR_STATUS, function(buffer) {
-          var data = new Uint8Array(buffer);
-          console.log('Buzzy-pixel updated status on device to');
-          for (var i in data) {
-            console.log(data[i]);
-          }
-        },
-        function(error) {
-            console.log('Buzzy-pixel error reading characteristic after set status');
-            console.log(error);
-            app.setStatus("Error reading characteristic after set status " + error);
-        }), 1000);
+        var encodedString = bluetoothle.bytesToEncodedString(arStatus);
+        app.log("Encoded string" + encodedString);
+        new Promise(function (resolve, reject) {
+            bluetoothle.write(resolve, reject,
+                { address: app.connectedPeripheral.address, service: BLE_BUZZ_PIXEL_SERVICE, characteristic: PUSH_COLOR_STATUS, value: encodedString });
+            }).then(app.writeSuccess, app.handleError);
     },
-    
-    timeoutId: 0,
-    
-    setStatus: function(status) {
-        if (app.timeoutId) {
-            clearTimeout(app.timeoutId);
+
+    writeSuccess: function(result) {
+        if (result.status === "written") {
+            var arStatus = bluetoothle.encodedStringToBytes(result.value);
+            for (var i in arStatus) {
+                window['status' + i].value = arStatus[i];
+                console.log(arStatus[i]);
+            }
+            // This is needed to update push characteristic with the written value for Home LED
+            new Promise(function (resolve, reject) {
+                bluetoothle.read(resolve, reject,
+                    { address: app.connectedPeripheral.address, service: BLE_BUZZ_PIXEL_SERVICE, characteristic: PUSH_COLOR_STATUS });
+                }).then(function(result) { console.log('Buzzy-pixel update and read status from device complete');}, app.handleError);
         }
-        messageDiv.innerText = status;
-        app.timeoutId = setTimeout(function() { messageDiv.innerText = ""; }, 14000);
+    },
+
+    setStatus: function(status) {
+        messageDiv.innerText = messageDiv.innerText + '\n' + status;
+    },
+
+    log: function(msg, level) {
+        level = level || "log";
+        if (typeof msg === "object") {
+
+            msg = JSON.stringify(msg, null, "  ");
+        }
+        console.log(msg);
+        if (level === "status" || level === "error") {
+            app.setStatus(msg);
+        }
+    },
+
+    handleError: function (error) {
+        var msg;
+        if (error.error && error.message) {
+            var errorItems = [];
+            if (error.service) {
+                errorItems.push("service: " + error.service);
+            }
+            if (error.characteristic) {
+                errorItems.push("characteristic: " + error.characteristic);
+            }
+            msg = "Error on " + error.error + ": " + error.message + (errorItems.length && (" (" + errorItems.join(", ") + ")"));
+        }
+        else {
+            msg = error;
+        }
+        app.log(msg, "error");
+
+        if (error.error === "read" && error.service && error.characteristic) {
+            app.setStatus(error.service, error.characteristic, "Error: " + error.message);
+        }
     }
 };
 

@@ -1,11 +1,25 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.example.blebuzzypixel" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>BLE Buzzy Pixel</name>
-    <description>
-        Cordova app for pushing status to Adafruit NeoPixel LEDs via BLE
-    </description>
-    <content src="index.html" />
-    <access origin="*" />
-    <preference name="Orientation" value="portrait" />
-    <preference name="DisallowOverscroll" value="true"/>
+<widget id="com.example.bluetoothlebuzzypixel" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+  <name>BluetoothLE Buzzy Pixel</name>
+  <description>
+    Cordova app communicating with Adafruit NeoPixel LEDs via BLE
+  </description>
+  <content src="index.html" />
+  <plugin name="cordova-plugin-whitelist" spec="1" />
+  <access origin="*" />
+  <allow-intent href="http://*/*" />
+  <allow-intent href="https://*/*" />
+  <allow-intent href="geo:*" />
+  <platform name="android">
+    <allow-intent href="market:*" />
+  </platform>
+  <platform name="ios">
+    <allow-intent href="itms:*" />
+    <allow-intent href="itms-apps:*" />
+  </platform>
+  <preference name="KeepRunning" value="True" />
+  <preference name="ShowTitle" value="True" />
+  <preference name="InAppBrowserStorageEnabled" value="True" />
+  <preference name="SuppressesIncrementalRendering" value="True" />
+  <plugin name="cordova-plugin-bluetoothle " version="3.1.0" />
 </widget>
