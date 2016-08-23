@@ -33,15 +33,12 @@
             Status 7
             <input type="text" value="1" id="status6"/>
             <button id="updateButton">Update</button>
-
-            Home BLE Device Status: <div id="readStatusText">
-                &nbsp;
-            </div>
-
-            Polling Status: <div id="pollingStatusText">
-               &nbsp;
-            </div>
-      
+            <br/>
+            Home BLE Device And Status:
+            <div id ="bleDeviceName"></div>
+            <div id="readStatusText"></div>
+            Polling Status:
+            <div id="pollingStatusText"></div>
             <button id="disconnectButton">Disconnect</button>
         </div>
         <div id="messageDiv"></div>
@@ -49,5 +46,6 @@
         <script type="text/javascript" src="js/config.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
         <script type="text/javascript" src="js/status-service.js"></script>
+        <script type="text/javascript" src="js/reconnect.js"></script>
     </body>
 </html>
