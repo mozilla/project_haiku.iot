@@ -10,8 +10,8 @@ Follow below commands to create cordova Android app. [Link with command details]
 * install android studio which brings in android sdk http://developer.android.com/sdk/installing/index.html?pkg=studio
 
 * cd BLE-Buzzy-Pixel/
-* To check if you satisfy requirements for building the platform use command - cordova requirements
 * cordova platform add android
+* To check if you satisfy requirements for building the platform use command - cordova requirements
 * cordova plugin add cordova-plugin-bluetoothle@3.1.0 - [Tested with 3.1.0]
 * cordova plugin add path to local cordova-plugin-fetch directory [../Plugins/cordove-plugin-fetch]
 * cordova build
