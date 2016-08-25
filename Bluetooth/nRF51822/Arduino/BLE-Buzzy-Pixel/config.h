@@ -1,6 +1,11 @@
 #ifndef INC_BLEBUZZYPIXEL_CONFIG_H
 #define INC_BLEBUZZYPIXEL_CONFIG_H
 
+// This device ID should be unique to help distinguish multiple devices in the
+// same area while we're doing prototyping. Just change it to some unique value
+// before building.
+#define DEVICE_ID "1"
+
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = Arduino pin number (most are valid)
 // Parameter 3 = pixel type flags, add together as needed:

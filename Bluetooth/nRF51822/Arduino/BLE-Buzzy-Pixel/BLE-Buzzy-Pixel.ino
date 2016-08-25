@@ -42,8 +42,8 @@ void setup() {
   strip.show();
 
   // set advertised name and service
-  blePeripheral.setDeviceName("BLE-Buzzy-Pixel");
-  blePeripheral.setLocalName("BLE-Buzzy-Pixel");
+  blePeripheral.setDeviceName("BLE-Buzzy-Pixel " DEVICE_ID);
+  blePeripheral.setLocalName("BLE-Buzzy-Pixel " DEVICE_ID);
   blePeripheral.setAdvertisedServiceUuid(bleBuzzService.uuid());
 
   // add service and characteristics
