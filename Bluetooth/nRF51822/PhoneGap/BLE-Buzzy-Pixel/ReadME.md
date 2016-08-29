@@ -14,6 +14,7 @@ Follow below commands to create cordova Android app. [Link with command details]
 * To check if you satisfy requirements for building the platform use command - cordova requirements
 * cordova plugin add cordova-plugin-bluetoothle@3.1.0 - [Tested with 3.1.0]
 * cordova plugin add path to local cordova-plugin-fetch directory [../Plugins/cordove-plugin-fetch]
+* Update [config settings here](https://github.com/mozilla/project_haiku.iot/blob/master/Bluetooth/nRF51822/PhoneGap/BLE-Buzzy-Pixel/www/js/config.js). Status Service is link to cloud service to read and update status and messages.
 * cordova build
 * connect android device to your machine, then to run app use command- cordova run android
 
