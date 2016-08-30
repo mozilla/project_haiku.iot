@@ -6,6 +6,14 @@
 // before building.
 #define DEVICE_ID "1"
 
+// The UUID for our BLE device. UUIDs can be:
+//   16-bit: "ffff"
+//  128-bit: "19b10010e8f2537e4f6cd104768a1214" (dashed format also supported)
+#define BLE_UUID "0318e986-54b5-11e6-beb8-9e71128cae77"
+
+// The index of the LED representing oneself.
+#define SELF_LED 0
+
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = Arduino pin number (most are valid)
 // Parameter 3 = pixel type flags, add together as needed:
@@ -15,20 +23,21 @@
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 //   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
 
-// The number of NeoPixels connected to the board.
-#define PIXEL_COUNT 7
+// The number of slots (including the user); each slot has an associated button
+// and LED.
+#define SLOT_COUNT 7
+
 // The pin connected to the input of the NeoPixels.
-#define PIXEL_PIN   5
+#define PIXEL_PIN 5
 // The type of NeoPixels, see the NeoPixel strandtest example for more options.
-#define PIXEL_TYPE  NEO_GRB + NEO_KHZ800
+#define PIXEL_TYPE NEO_GRB + NEO_KHZ800
 
-// define pins (varies per shield/board)
-#define BLE_REQ     10
-#define BLE_RDY     2
-#define BLE_RST     9
+// Define pins (varies per shield/board).
+#define BLE_REQ 10
+#define BLE_RDY 2
+#define BLE_RST 9
 
-// Button pin
+// Button pin.
 #define BUTTON_PIN  6
-#define BUF_LEN     7
 
 #endif
