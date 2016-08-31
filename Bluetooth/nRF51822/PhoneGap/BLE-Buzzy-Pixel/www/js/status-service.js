@@ -2,7 +2,7 @@ var intervalID;
 
 function startPolling() {
   stopPolling();
-  intervalID = setInterval(requestStatus, 10000);
+  intervalID = setInterval(requestStatus, 2000);
   pollingStatusText.innerText = "Start";
 }
 
