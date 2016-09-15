@@ -15,7 +15,7 @@ See https://github.com/adafruit/Adafruit_NeoPixel/pull/42
 
 * Open BLE-Buzzy-Pixel.ino file. Update config.h with pin out and pixel count settings as per your circuit and upload the code to BLE Nano.
 
-* If there are erros while uploading sketch using Arduino IDE, follow [instrcutions here](https://github.com/mozilla/project_haiku.iot/tree/master/Bluetooth/nRF51822/Arduino#arduino-upload-instructions-if-nothing-else-work) to copy latest bootloader.hex to BLE Nano board. 
+* If there are erros while uploading sketch using Arduino IDE, follow [instrcutions here](https://github.com/mozilla/project_haiku.iot/tree/master/Bluetooth/nRF51822/Arduino/Examples#arduino-upload-instructions-if-nothing-else-work) to copy latest bootloader.hex to BLE Nano board. 
 
 * To test uploadeded sketch BLE-Buzzy-Pixel, use LightBlue iOS app or nRFCOnnect Android app to find BLE Nano peripheral device 'BLE-Buzzy-Pixel'  and select to connect. It should show  READ-WRITE and  READ-NOTIFY services. Select READ-WRITE service and click on Write new value and enter ‘00’ for turning NeoPixel off. Enter ‘01’ to turn NeoPixel on. You can see the output in serial monitor at baud rate 9600.
 Click on READ-NOTIFY service and start listening to notifications. Button press should send 0x01 and turn NeoPixel on. Release of button should send 0x00 and turn NeoPixel off.
