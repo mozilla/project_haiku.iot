@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                     String uri = "";
                     // set the data
                     if("".equals(number.getText().toString())) {
-                        uri = "tel:6507599066";
+                        uri = "tel:#"; // To be configured while shipping
                     } else {
                         uri = "tel:" + number.getText().toString();
                     }
