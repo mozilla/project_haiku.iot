@@ -9,6 +9,7 @@ num_pages = pdfReader.numPages
 currNum = sys.argv[1].split('-')[0:3]
 currNum[2]= currNum[2][0:4]
 currPhoneNum = ''
+
 for i in currNum:
     currPhoneNum += i
 incomingCall = []
