@@ -3,4 +3,5 @@
 .DS_Store
 build
 .idea/*
-
+*.csv
+*.json

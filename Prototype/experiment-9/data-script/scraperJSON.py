@@ -1,17 +1,24 @@
 import PyPDF2 
 import json
+import sys
 
-pdfFileObj = open('test.pdf', 'rb')
-textFile = open('exampleJSON.json', 'w')
+pdfFileObj = open(sys.argv[1], 'rb')
+textFile = open(sys.argv[1]+'.json', 'w')
 pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
 num_pages = pdfReader.numPages
-currPhoneNum = '9999999999'
+currNum = sys.argv[1].split('-')[0:3]
+currNum[2]= currNum[2][0:4]
+currPhoneNum = ''
+
+for i in currNum:
+    currPhoneNum += i
 incomingCall = []
 outgoingCall = []
 incomingSMS = []
 outgoingSMS = []
 data = {}
 myPhone = {}
+
 for x in range(0, num_pages):
     current_page = pdfReader.getPage(x).extractText()
     currentData = current_page.splitlines()

@@ -1,9 +1,12 @@
 import PyPDF2 
-pdfFileObj = open('test.pdf', 'rb')
-textFile = open('exampleCSV.csv', 'w')
+import sys
+
+pdfFileObj = open(sys.argv[1], 'rb')
+textFile = open(sys.argv[1]+'.csv', 'w')
 pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
 num_pages = pdfReader.numPages
 data = []
+
 for x in range(0, num_pages):
     current_page = pdfReader.getPage(x).extractText()
     currentData = current_page.splitlines()
