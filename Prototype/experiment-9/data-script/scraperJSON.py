@@ -4,10 +4,11 @@ import sys
 import re
 import time
 import dateutil.parser
+import os
 
 pdfFileObj = open(sys.argv[1], 'rb')
-
-lookupFileObj = open('./lookup.json')
+lookupFilename = os.path.dirname(os.path.realpath(__file__)) + '/lookup.json'
+lookupFileObj = open(lookupFilename)
 lookupData = json.load(lookupFileObj)
 numbersToIds = {}
 for i in lookupData.keys():
