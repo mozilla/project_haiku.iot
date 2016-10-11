@@ -1,34 +1,32 @@
-#PyPDF2
+Data Munging and Reports
+========================
 
-PyPDF2 is a pure-python PDF library capable of
-splitting, merging together, cropping, and transforming
-the pages of PDF files. It can also add custom
-data, viewing options, and passwords to PDF files.
-It can retrieve text and metadata from PDFs as well
-as merge entire files together.
+The raw data comes to use in PDF form from AT&T's account/billing page. The `scraperJSON.py` script turns those into usable JSON.
 
-Homepage  
-http://mstamy2.github.io/PyPDF2/
+scraperJSON.py setup
+--------------------
 
-##Examples
+You'll need [pip](https://pypi.python.org/pypi/pip) to get the dependencies. If you don't already have pip:
 
-Please see `sample code` folder
-
-##Documentation
-
-Documentation is available at  
-https://pythonhosted.org/PyPDF2/
-
-
-##FAQ
-Please see  
-http://mstamy2.github.io/PyPDF2/FAQ.html
-
-
-##Tests
-PyPDF2 includes a test suite built on the unittest framework. All tests are located in the "Tests" folder.
-Tests can be run from the command line by:
-
-```bash
-python -m unittest Tests.tests
 ```
+sudo easy_install pip
+```
+
+then, in this directory (you may need to sudo if you arent using a virtualenv)
+
+```
+pip install PyPDF2
+pip install python-dateutil
+```
+
+Generating JSON
+---------------
+
+The raw data from AT&T uses actual phone numbers - in the filename (this is the device in question - don't rename that file we need that) - and in the call/sms log. We map these to device IDs to anonymize and allow us to publish the JSON data files. `lookup.example.json` has an example of the format - copy this to `lookup.json` and populate it with the actual phone numbers and device IDs.
+
+Then, to produce the JSON output:
+
+```
+python scraperJSON.py 'path/to/the/ATandT/download/999-999-9999_Data and Text Usage_10_3_2016_10_10_2016.pdf' > 999-999-9999.json
+```
+
