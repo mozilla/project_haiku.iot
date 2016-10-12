@@ -7,5 +7,5 @@
 for PDF in "$@"
 do
   outfile=`echo $PDF | sed 's/\(.*\.\)pdf/\1json/'`
-  python scraperJSON.py "$PDF" > "$outfile"
+  python scraperJSON.py "$PDF"
 done
