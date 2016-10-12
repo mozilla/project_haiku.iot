@@ -1,0 +1,74 @@
+{
+    "deviceId": "7b",
+    "incomingCall": [
+        {
+            "contact": "7a",
+            "date": "10/4/2016",
+            "datetime": "2016-10-04T17:32:06",
+            "duration": "0min 2sec",
+            "time": "05:32:06 PM CDT"
+        },
+        {
+            "contact": "7a",
+            "date": "10/10/2016",
+            "datetime": "2016-10-10T19:31:58",
+            "duration": "0min 0sec",
+            "time": "07:31:58 PM CDT"
+        }
+    ],
+    "incomingSMS": [
+        {
+            "contact": "7a",
+            "date": "10/6/2016",
+            "datetime": "2016-10-06T17:39:36",
+            "duration": "NA",
+            "time": "05:39:36 PM CDT"
+        }
+    ],
+    "outgoingCall": [
+        {
+            "contact": "7a",
+            "date": "10/4/2016",
+            "datetime": "2016-10-04T17:31:38",
+            "duration": "0min 15sec",
+            "time": "05:31:38 PM CDT"
+        }
+    ],
+    "outgoingSMS": [
+        {
+            "contact": "7a",
+            "date": "10/4/2016",
+            "datetime": "2016-10-04T17:30:58",
+            "duration": "NA",
+            "time": "05:30:58 PM CDT"
+        },
+        {
+            "contact": "7a",
+            "date": "10/4/2016",
+            "datetime": "2016-10-04T17:31:44",
+            "duration": "NA",
+            "time": "05:31:44 PM CDT"
+        },
+        {
+            "contact": "7a",
+            "date": "10/6/2016",
+            "datetime": "2016-10-06T17:39:30",
+            "duration": "NA",
+            "time": "05:39:30 PM CDT"
+        },
+        {
+            "contact": "7a",
+            "date": "10/6/2016",
+            "datetime": "2016-10-06T17:39:40",
+            "duration": "NA",
+            "time": "05:39:40 PM CDT"
+        },
+        {
+            "contact": "7a",
+            "date": "10/6/2016",
+            "datetime": "2016-10-06T18:27:29",
+            "duration": "NA",
+            "time": "06:27:29 PM CDT"
+        }
+    ]
+}

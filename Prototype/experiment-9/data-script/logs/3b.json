@@ -1,0 +1,172 @@
+{
+    "deviceId": "3b",
+    "incomingCall": [
+        {
+            "contact": "3a",
+            "date": "10/4/2016",
+            "datetime": "2016-10-04T16:06:39",
+            "duration": "0min 10sec",
+            "time": "04:06:39 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/6/2016",
+            "datetime": "2016-10-06T18:38:29",
+            "duration": "0min 4sec",
+            "time": "06:38:29 PM CDT"
+        }
+    ],
+    "incomingSMS": [
+        {
+            "contact": "3a",
+            "date": "10/4/2016",
+            "datetime": "2016-10-04T15:41:16",
+            "duration": "NA",
+            "time": "03:41:16 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/4/2016",
+            "datetime": "2016-10-04T15:41:28",
+            "duration": "NA",
+            "time": "03:41:28 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/4/2016",
+            "datetime": "2016-10-04T15:41:31",
+            "duration": "NA",
+            "time": "03:41:31 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/4/2016",
+            "datetime": "2016-10-04T15:41:42",
+            "duration": "NA",
+            "time": "03:41:42 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/4/2016",
+            "datetime": "2016-10-04T15:41:47",
+            "duration": "NA",
+            "time": "03:41:47 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/4/2016",
+            "datetime": "2016-10-04T15:41:50",
+            "duration": "NA",
+            "time": "03:41:50 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/4/2016",
+            "datetime": "2016-10-04T15:42:41",
+            "duration": "NA",
+            "time": "03:42:41 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/6/2016",
+            "datetime": "2016-10-06T17:40:20",
+            "duration": "NA",
+            "time": "05:40:20 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/6/2016",
+            "datetime": "2016-10-06T17:52:46",
+            "duration": "NA",
+            "time": "05:52:46 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/6/2016",
+            "datetime": "2016-10-06T18:08:29",
+            "duration": "NA",
+            "time": "06:08:29 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/6/2016",
+            "datetime": "2016-10-06T18:38:07",
+            "duration": "NA",
+            "time": "06:38:07 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/6/2016",
+            "datetime": "2016-10-06T18:38:39",
+            "duration": "NA",
+            "time": "06:38:39 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/6/2016",
+            "datetime": "2016-10-06T18:38:39",
+            "duration": "NA",
+            "time": "06:38:39 PM CDT"
+        }
+    ],
+    "outgoingCall": [
+        {
+            "contact": "3a",
+            "date": "10/4/2016",
+            "datetime": "2016-10-04T16:05:42",
+            "duration": "0min 40sec",
+            "time": "04:05:42 PM CDT"
+        }
+    ],
+    "outgoingSMS": [
+        {
+            "contact": "3a",
+            "date": "10/4/2016",
+            "datetime": "2016-10-04T15:38:18",
+            "duration": "NA",
+            "time": "03:38:18 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/4/2016",
+            "datetime": "2016-10-04T16:07:00",
+            "duration": "NA",
+            "time": "04:07:00 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/4/2016",
+            "datetime": "2016-10-04T16:07:02",
+            "duration": "NA",
+            "time": "04:07:02 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/6/2016",
+            "datetime": "2016-10-06T17:40:26",
+            "duration": "NA",
+            "time": "05:40:26 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/6/2016",
+            "datetime": "2016-10-06T17:52:50",
+            "duration": "NA",
+            "time": "05:52:50 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/6/2016",
+            "datetime": "2016-10-06T18:32:53",
+            "duration": "NA",
+            "time": "06:32:53 PM CDT"
+        },
+        {
+            "contact": "3a",
+            "date": "10/6/2016",
+            "datetime": "2016-10-06T18:38:01",
+            "duration": "NA",
+            "time": "06:38:01 PM CDT"
+        }
+    ]
+}
