@@ -40,21 +40,21 @@ function printUsage() {
 }
 
 function createSeries(data) {
-  var incomingSMS = data.incomingSMS.map(function(entry) {
+  var incomingSMS = data.incomingSMS.map(function(entry, i) {
     var date = new Date(entry.datetime);
-    return [date, 0];
+    return ['incomingSMS:'+i, date, 0, 1]; //'incomingSMS'
   });
-  var outgoingSMS = data.outgoingSMS.map(function(entry) {
+  var outgoingSMS = data.outgoingSMS.map(function(entry, i) {
     var date = new Date(entry.datetime);
-    return [date, 1];
+    return ['outgoingSMS:'+i, date, 1, 1]; // 'outgoingSMS'
   });
-  var incomingCalls = data.incomingCall.map(function(entry) {
+  var incomingCalls = data.incomingCall.map(function(entry, i) {
     var date = new Date(entry.datetime);
-    return [date, 2];
+    return ['incomingCall:'+i, date, 2, 1]; // 'incomingSMS'
   });
-  var outgoingCalls = data.outgoingCall.map(function(entry) {
+  var outgoingCalls = data.outgoingCall.map(function(entry, i) {
     var date = new Date(entry.datetime);
-    return [date, 3];
+    return ['outgoingCall:'+i, date, 3, 1]; // 'outgoingCalls'
   });
   return [].concat(incomingSMS, outgoingSMS, incomingCalls, outgoingCalls);
 }
@@ -66,9 +66,10 @@ if (participantId) {
   window.fetch('./logs/' + participantId + '.json').then(function(resp) {
     resp.json().then(function(data) {
       console.log('loaded data: ', data);
-      google.charts.load('current', {'packages':['scatter']});
-      chartDataSeries = createSeries(data);
+      google.charts.load('current', {'packages':['corechart']});
+      // google.charts.load('current', {'packages':['scatter']});
       // google.charts.load('current', {'packages':['timeline']});
+      chartDataSeries = createSeries(data);
       google.charts.setOnLoadCallback(function() {
         drawChart(chartDataSeries);
       });
@@ -97,10 +98,13 @@ if (participantId) {
 function drawChart(seriesData) {
   console.log('drawChart, seriesData:', seriesData);
   var container = document.getElementById('timeline');
-  var data = new google.visualization.DataTable();
-  data.addColumn('date', 'Date/Time');
-  data.addColumn('number', 'Event');
-  data.addRows(seriesData);
+  // var data = new google.visualization.DataTable();
+  seriesData.unshift(['ID', 'Date/Time', 'Event', 'Duration']);
+  var data = google.visualization.arrayToDataTable(seriesData);
+  // data.addColumn('date', 'Date/Time');
+  // data.addColumn('string', 'Event');
+  // data.addColumn('number', 'Duration');
+  // data.addRows(seriesData);
 
   var options = {
     width: 1200,
@@ -110,12 +114,15 @@ function drawChart(seriesData) {
     },
     legend: 'none',
     hAxis: {title: 'Date/Time'},
-    vAxis: {title: 'Event Type', type: 'string'},
-    explorer: {}
+    vAxis: {title: 'Event'}, // , type: 'string'
+    explorer: {},
+    bubble: {textStyle: {fontSize: 9}}
   };
 
-  var chart = new google.charts.Scatter(container);
-  chart.draw(data, google.charts.Scatter.convertOptions(options));
+  // var chart = new google.charts.Scatter(container);
+  // chart.draw(data, google.charts.Scatter.convertOptions(options));
+  var chart = new google.visualization.BubbleChart(container);
+  chart.draw(data, options);
 }
 
 </script>
