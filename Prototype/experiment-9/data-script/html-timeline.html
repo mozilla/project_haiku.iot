@@ -4,8 +4,13 @@
   <meta charset="utf-8">
   <title>Timeline</title>
   <style>
-    td {
+    table {
+      border: 1px solid #ccc;
+    }
+    td, th {
       outline: 1px solid #ccc;
+      padding: 2px 8px;
+      text-align: center;
     }
     canvas {
       width: auto;
@@ -14,7 +19,8 @@
 </head>
 <body>
 
-<div id="timeline" style="height: 180px;"></div>
+<div id="timeline"></div>
+
 <table id="tabular">
 </table>
 
@@ -72,6 +78,27 @@ function createSeries(data) {
     { label: 'outgoingSMS', data: outgoingSMS },
     { label: 'incomingCalls', data: incomingCalls },
     { label: 'outgoingCalls', data: outgoingCalls }
+  });
+  var outgoingSMS = data.outgoingSMS.map(function(entry, i) {
+    var date = new Date(entry.datetime);
+    entry.type = 'outgoingSMS';
+    return [date, getSecondsFromDurationString(entry.duration), entry];
+  });
+  var incomingCalls = data.incomingCall.map(function(entry, i) {
+    var date = new Date(entry.datetime);
+    entry.type = 'incomingCall';
+    return [date, getSecondsFromDurationString(entry.duration), entry];
+  });
+  var outgoingCalls = data.outgoingCall.map(function(entry, i) {
+    var date = new Date(entry.datetime);
+    entry.type = 'outgoingCall';
+    return [date, getSecondsFromDurationString(entry.duration), entry];
+  });
+  return [
+    { label: 'incomingSMS', type: 'incomingSMS', data: incomingSMS },
+    { label: 'outgoingSMS', type: 'outgoingSMS', data: outgoingSMS },
+    { label: 'incomingCalls', type: 'incomingCall', data: incomingCalls },
+    { label: 'outgoingCalls', type: 'outgoingCall', data: outgoingCalls }
   ];
 }
 
@@ -140,7 +167,7 @@ function renderData(colHeaders, allSeries) {
     width: 2000,
     height: 50*(allSeries.length+1),
     xOffset: 10,
-    scale: 50,
+    scale: 30,
     seriesStyles: [
       {fillStyle: 'green'},
       {fillStyle: 'blue'},
@@ -275,8 +302,8 @@ function drawEntries(ctx, series, opts) {
     var rawSize = isNaN(entry[1]) ? 1 : opts.secondSize * entry[1];
     var dotScale = 8;
     var size = dotScale*Math.max(rawSize, 1);
-    console.log('drawDot at size: ', rawSize, size, size*dotScale, entry);
-    console.log('drawDot at x: ', x+opts.xOffset, 'y: ' + (opts.rowOffset+25));
+    // console.log('drawDot at size: ', rawSize, size, size*dotScale, entry);
+    // console.log('drawDot at x: ', x+opts.xOffset, 'y: ' + (opts.rowOffset+25));
     drawDot(ctx, {
       x: x,
       y: opts.rowOffset+25,
@@ -318,6 +345,65 @@ function drawTable(table, allSeries, opts) {
   var thead = document.createElement('thead');
   var tbody = document.createElement('tbody');
 
+  var dataRowsFragment = document.createDocumentFragment();
+  var eventTypeCols = {};
+  var colCount = allSeries.length;
+  var entriesByDate = []
+
+  allSeries.forEach(function(series, i) {
+    eventTypeCols[series.type] = i+1;
+    entriesByDate.push.apply(entriesByDate, series.data);
+  });
+
+  var colHeaders = allSeries.map(function(series) {
+    return series.label;
+  });
+  colHeaders.unshift('Date/Time');
+  colHeaders.forEach(function(label) {
+    var th = document.createElement('th');
+    thead.appendChild(th);
+    th.textContent = label;
+  });
+
+  entriesByDate.sort(function(a,b){
+    // the first entry in the array is a date object
+    return a[0] - b[0];
+  });
+
+  function addRow(colsData) {
+    var tr = document.createElement('tr');
+    colsData.forEach(function(content) {
+      var td = document.createElement('td');
+      td.textContent = content;
+      tr.appendChild(td);
+    });
+    dataRowsFragment.appendChild(tr);
+  }
+
+  entriesByDate.forEach(function(seriesRow) {
+    var rowData = [];
+    var entry = seriesRow[2];
+    var colIndex = eventTypeCols[entry.type];
+    colHeaders.forEach(function(col, i) {
+      var value = '';
+      if (i === 0) {
+        value = seriesRow[0].toLocaleString();
+      } else if (i === colIndex) {
+        if (entry.duration && entry.duration !== 'NA') {
+          value = entry.duration;
+        } else {
+          value = '\u2022';
+        }
+      }
+      rowData.push(value);
+    });
+    console.log('add row: ', rowData, entry.type, seriesRow);
+    addRow(rowData);
+  });
+
+  table.appendChild(thead);
+  table.appendChild(tbody);
+  tbody.appendChild(dataRowsFragment);
 }
 
 </script>
