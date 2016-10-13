@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Timeline</title>
+  <style>
+    td {
+      outline: 1px solid #ccc;
+    }
+    canvas {
+      width: auto;
+    }
+  </style>
+</head>
+<body>
+
+<div id="timeline" style="height: 180px;"></div>
+<table id="tabular">
+</table>
+
+<script>
+'use strict';
+function getIdfromQueryString(queryStr) {
+  var query = {};
+  var pairs, nameValue, params = {};
+  if(!queryStr) {
+    return;
+  }
+  pairs = queryStr.split('&');
+  for(var i=0; i<pairs.length; i++) {
+    nameValue = pairs[i].split('=');
+    if(nameValue[0] && (nameValue[0] === 'id')){
+      return nameValue[1];
+    }
+  }
+}
+
+function printUsage() {
+    var container = document.getElementById('timeline');
+    var p1 = document.createElement('p');
+    p1.textContent = 'No lookup.json found, no id querystring given';
+    container.appendChild(p1);
+
+    var p2 = document.createElement('p');
+    p2.innerHTML = 'Usage: ' +
+    '<a href="timeline.html?id=1a">timeline.html?id=1a</a>'
+    ' where 1a.json is a file in the ./logs/ directory, produced by running a' +
+    ' PDF report from AT&T through scraperJSON.py';
+    container.appendChild(p2);
+}
+
+function createSeries(data) {
+  console.log('createSeries from data:', data);
+  var incomingSMS = data.incomingSMS.map(function(entry, i) {
+    var date = new Date(entry.datetime);
+    return [date, getSecondsFromDurationString(entry.duration), 'incomingSMS'];
+  });
+  var outgoingSMS = data.outgoingSMS.map(function(entry, i) {
+    var date = new Date(entry.datetime);
+    return [date, getSecondsFromDurationString(entry.duration), 'outgoingSMS'];
+  });
+  var incomingCalls = data.incomingCall.map(function(entry, i) {
+    var date = new Date(entry.datetime);
+    return [date, getSecondsFromDurationString(entry.duration), 'incomingCall'];
+  });
+  var outgoingCalls = data.outgoingCall.map(function(entry, i) {
+    var date = new Date(entry.datetime);
+    return [date, getSecondsFromDurationString(entry.duration), 'outgoingCall'];
+  });
+  return [
+    { label: 'incomingSMS', data: incomingSMS },
+    { label: 'outgoingSMS', data: outgoingSMS },
+    { label: 'incomingCalls', data: incomingCalls },
+    { label: 'outgoingCalls', data: outgoingCalls }
+  ];
+}
+
+var participantId = getIdfromQueryString(location.search.substring(1));
+var chartDataSeries;
+
+if (participantId) {
+  window.fetch('./logs/' + participantId + '.json').then(function(resp) {
+    resp.json().then(function(data) {
+      var seriesData = createSeries(data);
+      renderData(
+        ['', 'Date/Time'],
+        seriesData
+      );
+    });
+  });
+} else {
+  window.fetch('./lookup.json').then(function(resp) {
+    resp.json().then(function(data) {
+      var container = document.getElementById('timeline');
+      Object.keys(data).forEach(function(id) {
+        var p = document.createElement('p');
+        var a = document.createElement('a');
+        a.textContent = id;
+        a.href = 'html-timeline.html?id='+id;
+        p.appendChild(a);
+        container.appendChild(p);
+      });
+    });
+  }).catch(function(e) {
+    printUsage();
+  });
+  var selfLink
+  console.log('usage: html-timeline.html?id=1a');
+}
+
+var DAY_MS = 1000*60*60*24;
+
+function startOfDay(d) {
+  var start = new Date(d);
+  start.setHours(0, 0, 0, 0);
+  return start;
+}
+
+function renderData(colHeaders, allSeries) {
+  console.log('allSeries: ', allSeries);
+  var firstDate, lastDate;
+  var byDate = {};
+  allSeries.forEach(function(series) {
+    series.data.forEach(function(entry, i) {
+      var d = entry[0];
+      var key = getDateKey(d);
+      var coln = byDate[key] || (byDate[key] = []);
+      coln.push(entry);
+
+      if (!firstDate || d < firstDate) {
+        firstDate = d;
+      }
+      if (!lastDate || d > lastDate) {
+        lastDate = d;
+      }
+    });
+  });
+
+  var chartOpts = {
+    width: 2000,
+    height: 50*(allSeries.length+1),
+    xOffset: 10,
+    scale: 50,
+    seriesStyles: [
+      {fillStyle: 'green'},
+      {fillStyle: 'blue'},
+      {fillStyle: 'orange'},
+      {fillStyle: 'red'}
+    ],
+    axisStyle: {fillStyle: '#999'},
+    startDate: startOfDay(firstDate),
+    endDate: new Date(startOfDay(lastDate).getTime() + DAY_MS - 1)
+  }
+  console.log('firstDate:', firstDate);
+  console.log('lastDate:', lastDate);
+
+  var tableOpts = {};
+
+  drawChart(document.getElementById('timeline'), allSeries, chartOpts);
+  drawTable(document.getElementById('tabular'), allSeries, tableOpts);
+}
+
+function drawYAxis(ctx, allSeries, opts) {
+  var labelWidth = 0;
+  allSeries.forEach(function(series, i) {
+    ctx.fillStyle = '#000';
+    var width = ctx.measureText(series.label).width;
+    if (width > labelWidth) {
+      labelWidth = width;
+    }
+    ctx.fillText(series.label, opts.xOffset, i*50+25+5);
+  });
+  opts.xOffset = opts.xOffset + labelWidth + opts.xOffset;
+  opts.innerWidth = opts.width - opts.xOffset - 10;
+  console.log('drawYAxis: labelWidth: ' + labelWidth, 'xOffset: ' + opts.xOffset, 'innerWidth: ' + opts.innerWidth);
+
+  allSeries.forEach(function(series, i) {
+    // draw the center line
+    var rowOffset = i * 50;
+    ctx.fillStyle = '#aaa';
+    ctx.fillRect(opts.xOffset, rowOffset+25, opts.width-(opts.xOffset + 10), 1);
+  });
+}
+
+function drawXAxisRow(ctx, allSeries, opts) {
+  // full range is from start of first day to end of the last day
+  var startDateMs = opts.startDate.getTime();
+  var endDateMs = opts.endDate.getTime();
+  console.log('startDate: '+ opts.startDate.toLocaleString(),
+              'endDate: ' + opts.endDate.toLocaleString());
+  var totalMs = startDateMs - endDateMs;
+
+  var series = [];
+  var d;
+  console.log('drawXAxisRow, opts.xOffset: ', opts.xOffset);
+  for(var i = startDateMs; i<=endDateMs; i+=DAY_MS) {
+    d = new Date(i);
+    series.push([getDateKey(d), d]);
+  }
+  series.forEach(function(entry) {
+    var x = getPositionForDate(entry[1], opts.startDate, opts.endDate, opts.innerWidth);
+    // console.log('draw x label: ', entry[0], x, 10);
+    // grid lines
+    var hourDate = startOfDay(entry[1]);
+    var tickX;
+    var origFont = ctx.font;
+    ctx.font = "10px sans-serif";
+    for(var i=0; i<24; i++) {
+      hourDate.setHours(i);
+      tickX = getPositionForDate(hourDate, opts.startDate, opts.endDate, opts.innerWidth);
+      if (i % 4 === 0) {
+        ctx.fillStyle = '#999';
+        ctx.fillText(i, opts.xOffset+tickX-3, allSeries.length*50);
+      }
+      ctx.fillStyle = i % 12 === 0 ? '#999' : '#ccc';
+      ctx.fillRect(opts.xOffset+tickX, 10, 1, allSeries.length*50-20);
+    }
+    ctx.font = origFont
+    // date label
+    ctx.fillStyle = opts.seriesStyle.fillStyle;
+    ctx.fillText(entry[0], opts.xOffset+x-10, opts.rowOffset+25-10);
+  });
+  console.log('/drawXAxisRow');
+}
+
+function drawDot(ctx, opts) {
+  ctx.beginPath();
+  ctx.arc(opts.x, opts.y, opts.size/2, 0, 2 * Math.PI, false);
+  ctx.fillStyle = opts.fillStyle;
+  ctx.fill();
+  // console.log('drawDot: ', opts);
+}
+
+function drawChart(container, allSeries, opts) {
+  var canvas = document.createElement('canvas');
+  var numDays = Math.ceil((opts.endDate.getTime() - opts.startDate.getTime())/DAY_MS);
+  canvas.width = opts.width = numDays * 24 * opts.scale;
+  console.log('drawChart, numDays: '+ numDays, 'width: ' + canvas.width);
+  canvas.height = opts.height;
+  container.appendChild(canvas);
+  var ctx = canvas.getContext('2d');
+
+  var secondSize = (function() {
+    var end = opts.endDate;
+    var moment = new Date(end.getTime() - 1000);
+    console.log('secondSize, endDate: ' + end.toLocaleString());
+    console.log('secondSize, moment: ' + moment.toLocaleString());
+    var x = getPositionForDate(moment, opts.startDate, opts.endDate, opts.width);
+    var maxX = getPositionForDate(end, opts.startDate, opts.endDate, opts.width);
+    console.log('secondSize, x: ' + x, 'maxX: ' + maxX);
+    return maxX - x;
+  })()
+  opts.secondSize = secondSize;
+  console.log('secondSize: ', secondSize);
+
+  drawYAxis(ctx, allSeries, opts);
+
+  allSeries.forEach(function(series, i) {
+    var rowOptions = Object.create(opts);
+    rowOptions.rowOffset = i*50;
+    rowOptions.seriesStyle = rowOptions.seriesStyles[i];
+    console.log('drawEntries with rowOffset: ' + rowOptions.rowOffset, typeof rowOptions.rowOffset);
+    drawEntries(ctx, series.data, rowOptions);
+  });
+  var xAxisOptions = Object.create(opts);
+  xAxisOptions.seriesStyle = opts.axisStyle;
+  xAxisOptions.rowOffset = allSeries.length*50;
+  drawXAxisRow(ctx, allSeries, xAxisOptions);
+}
+
+function drawEntries(ctx, series, opts) {
+  ctx.fillStyle = opts.seriesStyle.fillStyle;
+  series.forEach((entry, i) => {
+    var x = getPositionForDate(entry[0], opts.startDate, opts.endDate, opts.width);
+    var rawSize = isNaN(entry[1]) ? 1 : opts.secondSize * entry[1];
+    var dotScale = 8;
+    var size = dotScale*Math.max(rawSize, 1);
+    console.log('drawDot at size: ', rawSize, size, size*dotScale, entry);
+    console.log('drawDot at x: ', x+opts.xOffset, 'y: ' + (opts.rowOffset+25));
+    drawDot(ctx, {
+      x: x,
+      y: opts.rowOffset+25,
+      fillStyle: opts.seriesStyle.fillStyle,
+      size: size
+    });
+  });
+}
+
+function getDateKey(d) {
+  return [d.getFullYear(), d.getMonth()+1, d.getDate()].join('-');
+}
+
+function getPositionForDate(date, startDate, endDate, size) {
+  var span = endDate.getTime() - startDate.getTime();
+  var fromStart = date.getTime() - startDate.getTime();
+  var propn = fromStart/span;
+  return size * propn;
+}
+
+function getSecondsFromDurationString(str) {
+  var resultSeconds = 0;
+  if (str == 'NA') {
+    return resultSeconds;
+  }
+  var m = str.match(/(\d+)min\s+(\d+)sec/);
+  if (m) {
+    var min = parseInt(m[1], 10);
+    var sec = parseInt(m[2], 10);
+    resultSeconds = sec + min*60
+  } else {
+    console.warn('didnt match in duration string: ', str);
+  }
+  return resultSeconds;
+}
+
+function drawTable(table, allSeries, opts) {
+  var tfoot = document.createElement('tfoot');
+  var thead = document.createElement('thead');
+  var tbody = document.createElement('tbody');
+
+}
+
+</script>
+</body>
+</html>
