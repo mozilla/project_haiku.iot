@@ -29,7 +29,9 @@ outFilename = filename.replace(\
     currPhoneNum, \
     numbersToIds[currPhoneNum] if numbersToIds.has_key(currPhoneNum) else 'unknown'\
 )
-outFilename = os.path.splitext(outFilename)[0]+'.json'
+
+outFilename = numbersToIds[currPhoneNum]+'.json'
+#outFilename = os.path.splitext(outFilename)[0]+'.json'
 outFileObj = open(outFilename, 'w')
 
 def populateOutput(data):
