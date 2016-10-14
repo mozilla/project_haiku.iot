@@ -70,14 +70,22 @@ var chartDataSeries;
 
 if (participantId) {
   window.fetch('./logs/' + participantId + '.json').then(function(resp) {
-    resp.json().then(function(data) {
-      var allSeries = createSeries(data);
-      chartEachSeries(allSeries);
+    if ((''+resp.status).startsWith('2')) {
+      resp.json().then(function(data) {
+        var allSeries = createSeries(data);
+        chartEachSeries(allSeries);
 
-      var tableOpts = {};
-      var tableView = Table.create(tableOpts);
-      tableView.draw(document.getElementById('tabular'), allSeries);
-    });
+        var tableOpts = {};
+        var tableView = Table.create(tableOpts);
+        tableView.draw(document.getElementById('tabular'), allSeries);
+      });
+    } else {
+      var container = document.getElementById('timeline');
+      var p1 = document.createElement('p');
+      console.log('Error loading '+participantId, resp.statusText);
+      p1.textContent = 'Error loading JSON for '+participantId + ': '+resp.statusText;
+      container.appendChild(p1);
+    }
   });
 } else {
   window.fetch('./logs/index.json').then(function(resp) {

@@ -1,0 +1,7 @@
+{
+  "description": "Data visualizations for Haiku studies/experiments",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0"
+  }
+}
