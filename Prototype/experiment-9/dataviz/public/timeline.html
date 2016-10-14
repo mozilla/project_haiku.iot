@@ -30,21 +30,6 @@
 <script src="js/timeline.js"></script>
 <script>
 'use strict';
-function getIdfromQueryString(queryStr) {
-  var query = {};
-  var pairs, nameValue, params = {};
-  if(!queryStr) {
-    return;
-  }
-  pairs = queryStr.split('&');
-  for(var i=0; i<pairs.length; i++) {
-    nameValue = pairs[i].split('=');
-    if(nameValue[0] && (nameValue[0] === 'id')){
-      return nameValue[1];
-    }
-  }
-}
-
 function printUsage() {
     var container = document.getElementById('timeline');
     var p1 = document.createElement('p');
@@ -80,25 +65,41 @@ function createSeries(data) {
   return [outgoingSMS, incomingSMS, outgoingCalls, incomingCalls ];
 }
 
-var participantId = getIdfromQueryString(location.search.substring(1));
+var participantId = util.getParamfromQueryString(location.search.substring(1), 'id');
 var chartDataSeries;
 
 if (participantId) {
   window.fetch('./logs/' + participantId + '.json').then(function(resp) {
     resp.json().then(function(data) {
-      var seriesData = createSeries(data);
-      renderData(seriesData);
+      var allSeries = createSeries(data);
+      chartEachSeries(allSeries);
+
+      var tableOpts = {};
+      var tableView = Table.create(tableOpts);
+      tableView.draw(document.getElementById('tabular'), allSeries);
     });
   });
 } else {
-  window.fetch('./lookup.json').then(function(resp) {
-    resp.json().then(function(data) {
+  window.fetch('./logs/index.json').then(function(resp) {
+    resp.json().then(function(filenames) {
       var container = document.getElementById('timeline');
-      Object.keys(data).forEach(function(id) {
+      filenames.sort(function(a, b) {
+        var ai = parseInt(a);
+        var bi = parseInt(b);
+        if (ai < bi) {
+          return -1;
+        } else if (ai > bi) {
+          return 1;
+        } else {
+          return a < b ? -1 : 1;
+        }
+      });
+      filenames.forEach(function(name) {
+        var id = name.replace(/\.json$/, '');
         var p = document.createElement('p');
         var a = document.createElement('a');
         a.textContent = id;
-        a.href = 'html-timeline.html?id='+id;
+        a.href = 'timeline.html?id='+id;
         p.appendChild(a);
         container.appendChild(p);
       });
@@ -110,7 +111,7 @@ if (participantId) {
   console.log('usage: html-timeline.html?id=1a');
 }
 
-function renderData(allSeries) {
+function chartEachSeries(allSeries) {
   console.log('allSeries: ', allSeries);
   var firstDate, lastDate;
   allSeries.forEach(function(series) {
@@ -140,202 +141,8 @@ function renderData(allSeries) {
   console.log('firstDate:', firstDate);
   console.log('lastDate:', lastDate);
 
-  var tableOpts = {};
-
-  drawChart(document.getElementById('timeline'), allSeries, chartOpts);
-  drawTable(document.getElementById('tabular'), allSeries, tableOpts);
-}
-
-function drawYAxis(ctx, allSeries, opts) {
-  var labelWidth = 0;
-  allSeries.forEach(function(series, i) {
-    ctx.fillStyle = '#000';
-    var width = ctx.measureText(series.label).width;
-    if (width > labelWidth) {
-      labelWidth = width;
-    }
-    ctx.fillText(series.label, opts.xOffset, i*50+25+5);
-  });
-  opts.xOffset = opts.xOffset + labelWidth + opts.xOffset;
-  opts.innerWidth = opts.width - opts.xOffset - 10;
-  console.log('drawYAxis: labelWidth: ' + labelWidth, 'xOffset: ' + opts.xOffset, 'innerWidth: ' + opts.innerWidth);
-
-  allSeries.forEach(function(series, i) {
-    // draw the center line
-    var rowOffset = i * 50;
-    ctx.fillStyle = '#aaa';
-    ctx.fillRect(opts.xOffset, rowOffset+25, opts.width-(opts.xOffset + 10), 1);
-  });
-}
-
-function drawXAxisRow(ctx, allSeries, opts) {
-  // full range is from start of first day to end of the last day
-  var startDateMs = opts.startDate.getTime();
-  var endDateMs = opts.endDate.getTime();
-  console.log('startDate: '+ opts.startDate.toLocaleString(),
-              'endDate: ' + opts.endDate.toLocaleString());
-  var totalMs = startDateMs - endDateMs;
-
-  var series = [];
-  var d;
-  console.log('drawXAxisRow, opts.xOffset: ', opts.xOffset);
-  for(var i = startDateMs; i<=endDateMs; i+=util.DAY_MS) {
-    d = new Date(i);
-    series.push([util.getDateKey(d), d]);
-  }
-  series.forEach(function(entry) {
-    var x = util.getPositionForDate(entry[1], opts.startDate, opts.endDate, opts.innerWidth);
-    // console.log('draw x label: ', entry[0], x, 10);
-    // grid lines
-    var hourDate = util.startOfDay(entry[1]);
-    var tickX;
-    var origFont = ctx.font;
-    ctx.font = "10px sans-serif";
-    for(var i=0; i<24; i++) {
-      hourDate.setHours(i);
-      tickX = util.getPositionForDate(hourDate, opts.startDate, opts.endDate, opts.innerWidth);
-      if (i % 4 === 0) {
-        ctx.fillStyle = '#999';
-        ctx.fillText(i, opts.xOffset+tickX-3, allSeries.length*50);
-      }
-      ctx.fillStyle = i % 12 === 0 ? '#999' : '#ccc';
-      ctx.fillRect(opts.xOffset+tickX, 10, 1, allSeries.length*50-20);
-    }
-    ctx.font = origFont
-    // date label
-    ctx.fillStyle = opts.seriesStyle.fillStyle;
-    ctx.fillText(entry[0], opts.xOffset+x-10, opts.rowOffset+25-10);
-  });
-  console.log('/drawXAxisRow');
-}
-
-function drawDot(ctx, opts) {
-  ctx.beginPath();
-  ctx.arc(opts.x, opts.y, opts.size/2, 0, 2 * Math.PI, false);
-  ctx.fillStyle = opts.fillStyle;
-  ctx.fill();
-  // console.log('drawDot: ', opts);
-}
-
-function drawChart(container, allSeries, opts) {
-  var canvas = document.createElement('canvas');
-  var numDays = Math.ceil((opts.endDate.getTime() - opts.startDate.getTime())/util.DAY_MS);
-  canvas.width = opts.width = numDays * 24 * opts.scale;
-  console.log('drawChart, numDays: '+ numDays, 'width: ' + canvas.width);
-  canvas.height = opts.height;
-  container.appendChild(canvas);
-  var ctx = canvas.getContext('2d');
-
-  var secondSize = (function() {
-    var end = opts.endDate;
-    var moment = new Date(end.getTime() - 1000);
-    console.log('secondSize, endDate: ' + end.toLocaleString());
-    console.log('secondSize, moment: ' + moment.toLocaleString());
-    var x = util.getPositionForDate(moment, opts.startDate, opts.endDate, opts.width);
-    var maxX = util.getPositionForDate(end, opts.startDate, opts.endDate, opts.width);
-    console.log('secondSize, x: ' + x, 'maxX: ' + maxX);
-    return maxX - x;
-  })()
-  opts.secondSize = secondSize;
-  console.log('secondSize: ', secondSize);
-
-  drawYAxis(ctx, allSeries, opts);
-
-  allSeries.forEach(function(series, i) {
-    var rowOptions = Object.create(opts);
-    rowOptions.rowOffset = i*50;
-    rowOptions.seriesStyle = rowOptions.seriesStyles[i];
-    console.log('drawEntries with rowOffset: ' + rowOptions.rowOffset, typeof rowOptions.rowOffset);
-    drawEntries(ctx, series.data, rowOptions);
-  });
-  var xAxisOptions = Object.create(opts);
-  xAxisOptions.seriesStyle = opts.axisStyle;
-  xAxisOptions.rowOffset = allSeries.length*50;
-  drawXAxisRow(ctx, allSeries, xAxisOptions);
-}
-
-function drawEntries(ctx, series, opts) {
-  ctx.fillStyle = opts.seriesStyle.fillStyle;
-  series.forEach((entry, i) => {
-    var x = util.getPositionForDate(entry[0], opts.startDate, opts.endDate, opts.width);
-    var rawSize = isNaN(entry[1]) ? 1 : opts.secondSize * entry[1];
-    var dotScale = 8;
-    var size = dotScale*Math.max(rawSize, 1);
-    // console.log('drawDot at size: ', rawSize, size, size*dotScale, entry);
-    // console.log('drawDot at x: ', x+opts.xOffset, 'y: ' + (opts.rowOffset+25));
-    drawDot(ctx, {
-      x: x,
-      y: opts.rowOffset+25,
-      fillStyle: opts.seriesStyle.fillStyle,
-      size: size
-    });
-  });
-}
-
-function drawTable(table, allSeries, opts) {
-  var tfoot = document.createElement('tfoot');
-  var thead = document.createElement('thead');
-  var tbody = document.createElement('tbody');
-
-  var dataRowsFragment = document.createDocumentFragment();
-  var eventTypeCols = {};
-  var colCount = allSeries.length;
-  var entriesByDate = []
-
-  allSeries.forEach(function(series, i) {
-    eventTypeCols[series.type] = i+1;
-    entriesByDate.push.apply(entriesByDate, series.data);
-  });
-
-  var colHeaders = allSeries.map(function(series) {
-    return series.label;
-  });
-  colHeaders.unshift('Date/Time');
-  colHeaders.forEach(function(label) {
-    var th = document.createElement('th');
-    thead.appendChild(th);
-    th.textContent = label;
-  });
-
-  entriesByDate.sort(function(a,b){
-    // the first entry in the array is a date object
-    return a[0] - b[0];
-  });
-
-  function addRow(colsData) {
-    var tr = document.createElement('tr');
-    colsData.forEach(function(content) {
-      var td = document.createElement('td');
-      td.textContent = content;
-      tr.appendChild(td);
-    });
-    dataRowsFragment.appendChild(tr);
-  }
-
-  entriesByDate.forEach(function(seriesRow) {
-    var rowData = [];
-    var entry = seriesRow[2];
-    var colIndex = eventTypeCols[entry.type];
-    colHeaders.forEach(function(col, i) {
-      var value = '';
-      if (i === 0) {
-        value = seriesRow[0].toLocaleString();
-      } else if (i === colIndex) {
-        if (entry.duration && entry.duration !== 'NA') {
-          value = entry.duration;
-        } else {
-          value = '\u2022';
-        }
-      }
-      rowData.push(value);
-    });
-    console.log('add row: ', rowData, entry.type, seriesRow);
-    addRow(rowData);
-  });
-
-  table.appendChild(thead);
-  table.appendChild(tbody);
-  tbody.appendChild(dataRowsFragment);
+  var timelineChart = Timeline.create(chartOpts);
+  timelineChart.draw(document.getElementById('timeline'), allSeries);
 }
 
 </script>
