@@ -1,0 +1,7 @@
+{
+  "name": "Project Haiku: Data Visualizations",
+  "description": "Reports and visualizations of data collected from user studies and other experiments",
+  "logo": "http://node-js-sample.herokuapp.com/node.svg",
+  "keywords": ["node", "express"],
+  "image": "heroku/nodejs"
+}
