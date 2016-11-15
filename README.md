@@ -10,4 +10,9 @@ Follow our progress in our Github wiki
 * Github won't notify you when this wiki is updated, but you can [subscribe via RSS](https://github.com/mozilla/project_haiku.iot/wiki.atom).
 
 Links to related repos
-* [Status API service](https://github.com/mozilla/project_haiku_status_api.iot)
+* The status API service used by Project Haiku and its experiments    
+https://github.com/mozilla/project_haiku_status_api.iot    
+* Reports and visualizations of data collected from Project Haiku user studies    
+https://github.com/mozilla/project_haiku_dataviz.iot    
+* Signalling server to connect pairs of WebRTC clients    
+https://github.com/mozilla/project_haiku_webrtc_signaling.iot    
