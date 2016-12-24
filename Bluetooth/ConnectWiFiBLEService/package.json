@@ -12,6 +12,6 @@
   "dependencies": {
     "bleno": "^0.4.1",
     "ursa": "^0.9.4",
-    "node-wifi": "^1.2.0"
+    "connman-simplified": "^0.1.3"
   }
 }
