@@ -9,87 +9,83 @@ Used latest debian image bone-debian-8.6-lxqt-4gb-armhf-2016-11-06-4gb.img.xz
 
 * Connect BBGW to wifi using connmanctl, type connmanctl.
 
-First turn tethering off for wifi! 
+* First turn tethering off for wifi! 
 
-connmanctl> tether wifi off
+    _connmanctl> tether wifi off_
 
-Disabled tethering for wifi
+    _Disabled tethering for wifi_
 
-You can then perform the rest of the connmanctl actions to set wifi:
+* You can then perform the rest of the connmanctl actions to set wifi:
 
-connmanctl> scan wifi
+    _connmanctl> scan wifi_
 
-Scan completed for wifi
+    _Scan completed for wifi_
 
-connmanctl> services
+    _connmanctl> services_
 
-TEST wifi_deadbeef0000_4b41595a4545505550_managed_psk
+    _TEST wifi_deadbeef0000_4b41595a4545505550_managed_psk_
 
-connmanctl> agent on
+    _connmanctl> agent on_
 
-Agent registered
+    _Agent registered_
 
-connmanctl> connect wifi_deadbeef0000_4b41595a4545505550_managed_psk
+    _connmanctl> connect wifi_deadbeef0000_4b41595a4545505550_managed_psk_
 
-Agent RequestInput wifi_deadbeef0000_4b41595a4545505550_managed_psk
+    _Agent RequestInput wifi_deadbeef0000_4b41595a4545505550_managed_psk_
 
-Passphrase = [ Type=psk, Requirement=mandatory, Alternates=[WPS ] ]
+    _Passphrase = [ Type=psk, Requirement=mandatory, Alternates=[WPS ] ]_
 
-WPS = [ Type=wpspin, Requirement=alternate ]
+    _WPS = [ Type=wpspin, Requirement=alternate ]_
 
-Passphrase? WTGD3g3gk69lw
+    _Passphrase? WTGD3g3gk69lw_
 
-Connected wifi_deadbeef0000_4b41595a4545505550_managed_psk
+    _Connected wifi_deadbeef0000_4b41595a4545505550_managed_psk_
 
-connmanctl> quit
+    _connmanctl> quit_
 
 * Once its connected to WiFi, install and update packages. This takes 15-30 minutes
 
-sudo apt-get update
+    _sudo apt-get update_
 
-sudo apt-get dist-upgrade
+    _sudo apt-get dist-upgrade_
 
 * Update node to latest version using below commands
 
-curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
+    _curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -_
 
-sudo apt-get install -y nodejs
+    _sudo apt-get install -y nodejs_
 
 
 ## To run [bleno module](https://github.com/sandeepmistry/bleno) on debian
 
 * Install all prerequisite from bleno github page for debian
 
-sudo apt-get install bluetooth bluez libbluetooth-dev libudev-dev
+    _sudo apt-get install bluetooth bluez libbluetooth-dev libudev-dev_
 
-* Run sudo bb-wl18xx-bluetooth
+* Run _sudo bb-wl18xx-bluetooth_
 
-This is built-in script for wireless-capable BeagleBone models
+    This is built-in script for wireless-capable BeagleBone models
 that discovers Bluetooth hardware and sets it up for use.
 
 * Verify if bluetoothhd is running using command
 
-pgrep bluetoothd
+    _pgrep bluetoothd_
 
-If yes disable the process by using below commands as it
-interferes with the [bluetooth process](https://github.com/sandeepmistry/bleno#linux)
+    If yes disable the process by using below commands as it
+interferes with the [bluetooth process](https://github.com/sandeepmistry/bleno#linux). /user/lib/bluetooth/bluetoothhd deamon shouldn’t appear in process list
 
-Disable /user/lib/bluetooth/bluetoothhd
+    _ps -ef | grep blue_
 
-deamon and shouldn’t appear in process list
-
-ps -ef | grep blue
-
-sudo kill -9 <pid>
+    _sudo kill -9 <pid>_
 
 ## Run ConnectWiFi BLEService
 
-npm install
+    npm install
 
-node connect.js
+    node connect.js
 
 ## Bluetooth logs using hcidump
 
-sudo apt-get install bluez-hcidump
+    sudo apt-get install bluez-hcidump
 
-sudo hcidump -t -x
+    sudo hcidump -t -x
