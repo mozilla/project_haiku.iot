@@ -82,6 +82,8 @@ interferes with the [bluetooth process](https://github.com/sandeepmistry/bleno#l
 
     npm install
 
+    npm install async@0.6.0 // To fix async.retry error thrown by connman-simplified node package
+
     node connect.js
 
 ## Bluetooth logs using hcidump

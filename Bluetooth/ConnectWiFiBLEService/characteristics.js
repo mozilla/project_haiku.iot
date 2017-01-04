@@ -83,13 +83,17 @@ var connectWiFi = function(pwd) {
       
       wifi.getNetworks(function(err,list) {
         
-        //wifi.disconnect();
+        wifi.disconnect();
         // get more readable list using getServicesString:
         console.log("networks: ",wifi.getServicesString(list));
-        // Throwing async.retry error, need to figure ??
+        // Throwing async.retry error fix, update async module to 0.6.0
         wifi.join(SSID, Pwd);
-        
       });
+
+      wifi.on('state',function(value) {
+        console.log("WiFi state change: ",value);
+      });
+
     });
   });
 };
