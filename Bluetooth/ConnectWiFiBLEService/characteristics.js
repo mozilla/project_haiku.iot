@@ -80,20 +80,30 @@ var connectWiFi = function(pwd) {
       if(err) {
         console.log('Error:', err);
       }
-      
-      wifi.getNetworks(function(err,list) {
-        
-        wifi.disconnect();
-        // get more readable list using getServicesString:
-        console.log("networks: ",wifi.getServicesString(list));
-        // Throwing async.retry error fix, update async module to 0.6.0
-        wifi.join(SSID, Pwd);
-      });
+
+      if(!properties.connected) { // not yet connected?
+        wifi.getNetworks(function(err,list) {
+          // get more readable list using getServicesString:
+          console.log("networks: ", wifi.getServicesString(list));
+          wifi.disconnect();
+          // Throwing async.retry error fix, update async module to 0.6.0
+          setTimeout(function() {
+            wifi.join(SSID, Pwd);
+          }, 5000);
+        });
+      }
 
       wifi.on('state',function(value) {
         console.log("WiFi state change: ",value);
+        if (value === Connman.WiFi.STATES.FAILURE) {
+           // Revisit retry logic
+           console.log("Retry Wifi Connect");
+           /* setTimeout(function() {
+              wifi.disconnect();
+              wifi.join(SSID, Pwd);
+            },10000); */
+        }
       });
-
     });
   });
 };

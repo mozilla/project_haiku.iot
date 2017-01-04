@@ -78,6 +78,11 @@ interferes with the [bluetooth process](https://github.com/sandeepmistry/bleno#l
 
     _sudo kill -9 <pid>_
 
+## Disconnect WiFi 
+* If BBGW is previously connected to WiFi, one can remove stored network name and passphrase by editing file  /var/lib/connman/*/settings
+* Reboot BBGW to disconnect from previously connected WiFi
+
+
 ## Run ConnectWiFi BLEService
 
     npm install
