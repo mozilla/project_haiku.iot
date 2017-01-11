@@ -1,6 +1,6 @@
-# project_haiku.iot
+# Mozilla Project Haiku
 
-#### Mozilla Project Haiku
+### Project Status - On Hold
 
 Learn about the Project Haiku (former Project Smart Home) on the Mozilla wiki
 * [https://wiki.mozilla.org/Connected_Devices/Projects/Project_Haiku](https://wiki.mozilla.org/Connected_Devices/Projects/Project_Haiku)
@@ -14,5 +14,5 @@ Links to related repos
 https://github.com/mozilla/project_haiku_status_api.iot    
 * Reports and visualizations of data collected from Project Haiku user studies    
 https://github.com/mozilla/project_haiku_dataviz.iot    
-* Signalling server to connect pairs of WebRTC clients    
-https://github.com/mozilla/project_haiku_webrtc_signaling.iot    
+* Signalling server to connect pairs of WebRTC clients
+https://github.com/mozilla/project_haiku_webrtc_signaling.iot
