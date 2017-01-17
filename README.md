@@ -1,6 +1,6 @@
 # Mozilla Project Haiku
 
-### Project Status - On Hold
+### &#x1F534; Project Status - On Hold
 
 Learn about the Project Haiku (former Project Smart Home) on the Mozilla wiki
 * [https://wiki.mozilla.org/Connected_Devices/Projects/Project_Haiku](https://wiki.mozilla.org/Connected_Devices/Projects/Project_Haiku)
