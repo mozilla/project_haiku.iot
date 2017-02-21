@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+ <html>
+ <head>
+   <meta charset="utf-8">
+   <title>Timeline</title>
+ </head>
+ <body>
+ 
+ <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+ <div id="timeline" style="height: 180px;"></div>
+ 
+ <script>
+ function getIdfromQueryString(queryStr) {
+   var query = {};
+   var pairs, nameValue, params = {};
+
+   if(!queryStr) {
+     return;
+   }
+   pairs = queryStr.split('&');
+
+   for(var i=0; i<pairs.length; i++) {
+     nameValue = pairs[i].split('=');
+
+     if(nameValue[0] && (nameValue[0] === 'id')){
+       return nameValue[1];
+     }
+   }
+ }
+ 
+ function printUsage() {
+     var container = document.getElementById('timeline');
+     var p1 = document.createElement('p');
+     p1.textContent = 'No lookup.json found, no id querystring given';
+     container.appendChild(p1);
+ 
+     var p2 = document.createElement('p');
+     p2.innerHTML = 'Usage: ' +
+     '<a href="linechart.html?id=1a">linechart.html?id=1a</a>'
+     ' where 1a.json is a file in the ./logs/ directory, produced by running a' +
+     ' PDF report from AT&T through scraperJSON.py';
+    container.appendChild(p2);
+ }
+ 
+ function countInArray(array, date){
+   var count = 0
+   for (var i = 0; i < array.length; i++) {
+     if (array[i][0].getDate() === date) {
+       count++;
+     }
+   }
+   return count;
+ }
+ 
+ function createSeries(data) {
+   var incomingSMS = data.incomingSMS.map(function(entry) {
+     var date = new Date(entry.datetime);
+     return [date, 0];
+   });
+   var outgoingSMS = data.outgoingSMS.map(function(entry) {
+     var date = new Date(entry.datetime);
+     return [date, 1];
+   });
+   var incomingCalls = data.incomingCall.map(function(entry) {
+     var date = new Date(entry.datetime);
+     return [date, 2];
+   });
+   var outgoingCalls = data.outgoingCall.map(function(entry) {
+     var date = new Date(entry.datetime);
+     return [date, 3];
+   });
+   var totalSMS = []
+   var totalCall = []
+   var last_date = null;
+   for (var i in incomingSMS) {
+     if (last_date != incomingSMS[i][0].getDate()) {
+       var temp = [incomingSMS[i][0].getDate(), countInArray(incomingSMS, incomingSMS[i][0].getDate()), 0, 0, 0]
+       totalSMS.push(temp);
+       last_date = incomingSMS[i][0].getDate();
+     }
+   }
+   var onlyOut = []
+   var last_date = null;
+   for (var i in outgoingSMS) {
+     if (outgoingSMS[i][0].getDate() !== last_date) {
+      for (var j in totalSMS) {
+        if (outgoingSMS[i][0].getDate() === totalSMS[j][0]){
+          totalSMS[j][2] += countInArray(outgoingSMS, outgoingSMS[i][0].getDate())
+        }
+      }
+       last_date = outgoingSMS[i][0].getDate()
+     }
+   }
+   /*
+      totalSMS looks like: 
+        [
+        [ date, # of text's]
+        [ 10, 4 ]
+      ]
+   */
+   var last_date = null;
+   for (var i in incomingCalls) {
+     if (last_date != incomingCalls[i][0].getDate()) {
+       for (var j in totalSMS) {
+         if (incomingCalls[i][0].getDate() === totalSMS[j][0]){
+           totalSMS[j][3] += countInArray(incomingCalls, incomingCalls[i][0].getDate())
+         }
+       }
+       last_date = incomingCalls[i][0].getDate();
+     }
+   }
+   var last_date = null;
+   for (var i in outgoingCalls) {
+     if (last_date != outgoingCalls[i][0].getDate()) {
+       for (var j in totalSMS) {
+         if (outgoingCalls[i][0].getDate() === totalSMS[j][0]){
+           totalSMS[j][4] += countInArray(outgoingCalls, outgoingCalls[i][0].getDate())
+         }
+       }
+       last_date = outgoingCalls[i][0].getDate();
+     }
+   }
+   return totalSMS;
+ }
+ 
+ var participantId = getIdfromQueryString(location.search.substring(1));
+ var chartDataSeries;
+ 
+ if (participantId) {
+   window.fetch('./logs/' + participantId + '.json').then(function(resp) {
+     resp.json().then(function(data) {
+       google.charts.load('current', {'packages':['corechart', 'line']});
+       chartDataSeries = createSeries(data);
+       // google.charts.load('current', {'packages':['timeline']});
+       google.charts.setOnLoadCallback(function() {
+         drawChart(chartDataSeries);
+       });
+     });
+   });
+ } else {
+   window.fetch('./lookup.json').then(function(resp) {
+     resp.json().then(function(data) {
+       var container = document.getElementById('timeline');
+       Object.keys(data).forEach(function(id) {
+         var p = document.createElement('p');
+         var a = document.createElement('a');
+         a.textContent = id;
+         a.href = 'linechart.html?id='+id;
+         p.appendChild(a);
+         container.appendChild(p);
+       });
+     });
+   }).catch(function(e) {
+     printUsage();
+   });
+   var selfLink
+   console.log('usage: linechart.html?id=1a');
+ }
+ 
+ function drawChart(seriesData) {
+   
+   console.log('drawChart, seriesData:', seriesData);
+   var container = document.getElementById('timeline');
+   var data = new google.visualization.DataTable();
+   data.addColumn('number', 'Date/Time');
+   data.addColumn('number', 'incomingSMS')
+   data.addColumn('number', 'outgoingSMS')
+   data.addColumn('number', 'incomingCalls')
+   data.addColumn('number', 'outgoingCalls')
+   data.addRows(seriesData);
+ 
+   var options = {
+       hAxis: {
+         title: 'Time - Date', 
+         ticks: [
+           10, 11, 12, 13, 14
+         ]
+       },
+       vAxis: {
+         title: '# of Events'
+       }
+     };
+ 
+   var chart = new google.visualization.LineChart(container);
+   chart.draw(data, options);
+ }
+ 
+ </script>
+ </body>
+ </html>
