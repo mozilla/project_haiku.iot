@@ -132,6 +132,17 @@ var app = {
     }
   },
 
+  handleAdvertising: function() {
+    bluetoothle.isAdvertising(function(result) {
+      if (result.isAdvertising) {
+        app.setStatus('BLE Device still advertising');
+      }
+      else {
+        app.setStatus('BLE Device has stopped advertising');
+      }
+    }, app.handleError);
+  },
+
   connectError: function(obj) {
     app.setStatus("Connect error: ");
     app.log("Connect error: " + obj.error + " - " + obj.message);
@@ -153,6 +164,10 @@ var app = {
 
   onData: function(result) {
     app.log(result.status);
+    if (result.status === "subscribed") {
+      app.handleAdvertising();
+    }
+
     if ((result.status === "read")  || (result.status === "subscribedResult")) {
       var arStatus = bluetoothle.encodedStringToBytes(result.value);
       var homeSlot = 'status' + selfLED;
@@ -196,10 +211,10 @@ var app = {
         app.log(arStatus[i]);
       }
       // This is needed to update push characteristic with the written value for Home LED
-      bluetoothle.read(function() { app.log('Buzzy-pixel read status from device complete'); },
+     /* bluetoothle.read(function() { app.log('Buzzy-pixel read status from device complete'); },
         app.handleError,
         { address: app.connectedPeripheral.address, service: BLE_BUZZ_PIXEL_SERVICE,
-          characteristic: PUSH_COLOR_STATUS });
+          characteristic: PUSH_COLOR_STATUS });*/
     }
   },
 
